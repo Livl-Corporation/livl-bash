@@ -148,7 +148,6 @@ show_menu() {
     echo "========================================"
 }
 
-# q) Rechercher des fichiers en fonction de différents critères
 function search_files() {
     file_name=$1
     min_size=$2
@@ -156,7 +155,6 @@ function search_files() {
     min_date=$4
     max_date=$5
 
-    # Construction de la commande find en fonction des critères fournis
     command="find . -type f"
     if [[ -n $file_name ]]; then
         command+=" -name '$file_name'"
@@ -176,37 +174,57 @@ function search_files() {
 
     # Affichage des fichiers correspondant aux critères
     echo "Résultats de la recherche:"
-    echo "$(eval "$command" | grep -v '^.$')"
+    results=$(eval "$command" | grep -v '^.$')
+    if [[ -z $results ]]; then
+        echo "Aucun fichier ne correspond aux critères de recherche."
+    else
+        echo "$results"
+    fi
 }
 
 # Menu pour les critères de recherche
 function show_filter_menu() {
-    echo "Critères de recherche disponibles:"
-    echo "  1) Nom de fichier"
-    echo "  2) Taille de fichier"
-    echo "  3) Date de création"
-    read -p "Entrez le numéro du critère à appliquer: " choice
+    file_name=""
+    min_size=""
+    max_size=""
+    min_date=""
+    max_date=""
 
-    case $choice in
+    while true; do
+        echo "Critères de recherche disponibles:"
+        echo "  1) Nom de fichier"
+        echo "  2) Taille de fichier"
+        echo "  3) Date de création"
+        echo "  4) Rechercher avec les critères sélectionnés"
+        echo "  5) Retour au menu principal"
+        read -p "Entrez votre choix: " choix
+
+        case $choix in
         1)
-            read -p "Entrez le nom du fichier: " file_name
-            search_files "$file_name"
+            read -p "Nom de fichier: " file_name
             ;;
         2)
-            read -p "Entrez la taille minimale des fichiers (en Ko): " min_size
-            read -p "Entrez la taille maximale des fichiers (en Ko): " max_size
-            search_files "" "$min_size" "$max_size" "" ""
+            read -p "Taille minimale (en Ko): " min_size
+            read -p "Taille maximale (en Ko): " max_size
             ;;
         3)
-            read -p "Entrez la date de création minimale (au format YYYY-MM-DD): " min_date
-            read -p "Entrez la date de création maximale (au format YYYY-MM-DD): " max_date
-            search_files "" "" "" "$min_date" "$max_date"
+            read -p "Date minimale (format: YYYY-MM-DD): " min_date
+            read -p "Date maximale (format: YYYY-MM-DD): " max_date
+            ;;
+        4)
+            if [[ -z $file_name && -z $min_size && -z $max_size && -z $min_date && -z $max_date ]]; then
+                echo "Veuillez sélectionner au moins un critère de recherche."
+            else
+                search_files "$file_name" "$min_size" "$max_size" "$min_date" "$max_date"
+            fi            ;;
+        5)
+            break
             ;;
         *)
-            echo "Choix invalide. Veuillez choisir un numéro entre 1 et 3."
-            show_filter_menu
+            echo "Choix invalide"
             ;;
-    esac
+        esac
+    done
 }
 
 
