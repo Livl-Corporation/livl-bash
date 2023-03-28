@@ -149,28 +149,10 @@ show_menu() {
 }
 
 function search_files() {
-    file_name=$1
-    min_size=$2
-    max_size=$3
-    min_date=$4
-    max_date=$5
+    filters=$1
 
-    command="find . -type f"
-    if [[ -n $file_name ]]; then
-        command+=" -name '$file_name'"
-    fi
-    if [[ -n $min_size ]]; then
-        command+=" -size +${min_size}k"
-    fi
-    if [[ -n $max_size ]]; then
-        command+=" -size -${max_size}k"
-    fi
-    if [[ -n $min_date ]]; then
-        command+=" -newermt '$min_date'"
-    fi
-    if [[ -n $max_date ]]; then
-        command+=" ! -newermt '$max_date'"
-    fi
+    command="find . -type f $filters"
+    echo "Commande: $command"
 
     # Affichage des fichiers correspondant aux critères
     echo "Résultats de la recherche:"
@@ -184,46 +166,75 @@ function search_files() {
 
 # Menu pour les critères de recherche
 function show_filter_menu() {
-    file_name=""
-    min_size=""
-    max_size=""
-    min_date=""
-    max_date=""
+    filters=""
 
     while true; do
-        echo "Critères de recherche disponibles:"
-        echo "  1) Nom de fichier"
-        echo "  2) Taille de fichier"
-        echo "  3) Date de création"
-        echo "  4) Rechercher avec les critères sélectionnés"
-        echo "  5) Retour au menu principal"
-        read -p "Entrez votre choix: " choix
 
+        mode=""
+        choix=""
+        
+        # Si des filtres sont déjà actifs
+        if [[ -n $filters ]]; then
+            echo "- Choisir une action -"
+            echo " [a] Ajouter un filtre ET"
+            echo " [e] Ajouter un filtre OU"
+            echo " [s] Lancer la recherche avec les critères sélectionnés"
+            echo " [m] Retour au menu principal"
+            read -p "Entrez votre choix: " choix
+
+            # Selection du mode de filtre
+            if [[ $choix_mode == "a" ]]; then
+                mode="-and"
+                choix=""
+            elif [[ $choix_mode == "e" ]]; then
+                mode="-or"
+                choix=""
+            fi
+        fi
+
+        # Si aucun filtre n'est actif
+        # Si le choix est vide ou qu'il n'est ni à 's' ni 'm'
+        if [[ -z $choix || ( $choix != "s" && $choix != "m" ) ]]; then
+            echo "- Choix du filtre -"
+            echo "  [n] Nom de fichier"
+            echo "  [i] Taille de fichier"
+            echo "  [d] Date de création"
+            echo "- Actions -"
+            echo "  [s] Lancer la recherche avec les critères sélectionnés"
+            echo "  [m] Retour au menu principal"
+            read -p "Entrez votre choix: " choix
+        fi
+        
         case $choix in
-        1)
-            read -p "Nom de fichier: " file_name
+        'n')
+            read -p "Nom de fichier: " file_name 
+            filters+=" $mode -name '$file_name'"
             ;;
-        2)
+        'i')
             read -p "Taille minimale (en Ko): " min_size
             read -p "Taille maximale (en Ko): " max_size
+            filters+=" $mode -size +${min_size}k -size -${max_size}k"
             ;;
-        3)
+        'd')
             read -p "Date minimale (format: YYYY-MM-DD): " min_date
             read -p "Date maximale (format: YYYY-MM-DD): " max_date
+            filters+=" $mode -newermt '$min_date' ! -newermt '$max_date'"
             ;;
-        4)
-            if [[ -z $file_name && -z $min_size && -z $max_size && -z $min_date && -z $max_date ]]; then
+        's')
+            if [[ -z filters ]]; then
                 echo "Veuillez sélectionner au moins un critère de recherche."
             else
-                search_files "$file_name" "$min_size" "$max_size" "$min_date" "$max_date"
-            fi            ;;
-        5)
+                search_files "$filters"
+            fi
+            ;;
+        'm')
             break
             ;;
         *)
             echo "Choix invalide"
             ;;
         esac
+
     done
 }
 
