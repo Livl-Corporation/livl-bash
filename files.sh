@@ -22,8 +22,8 @@ function show_subdirs() {
 function show_tree() {
     read -p "Entrez la profondeur souhaitée pour l'arborescence: " depth
     if [[ ! "$depth" =~ ^[0-9]+$ ]]; then
-        echo "La profondeur doit être un nombre entier positif."
-        exit 1
+        error_message "La profondeur doit être un nombre entier positif."
+        show_tree
     fi
     find . -maxdepth $depth
 }
@@ -37,8 +37,8 @@ function show_subdir_sizes() {
 function change_dir() {
     read -p "Entrez le chemin du répertoire dans lequel vous voulez aller: " newdir
     if [[ ! -d "$newdir" ]]; then
-        echo "Le répertoire spécifié n'existe pas."
-        exit 1
+        error_message "Le répertoire spécifié n'existe pas."
+        change_dir
     fi
     cd "$newdir"
 }
@@ -107,10 +107,13 @@ function search_name_all_outfile() {
     find . > $outfile
 }
 
-# t) Proposer une fonctionnalité supplémentaire que vous jugez intéressante et qui manque à la liste précédente
-# Une fonctionnalité intéressante pourrait être de rechercher des fichiers en fonction de leur contenu. Par exemple :
+# t) Rechercher des fichiers en fonction de leur contenu
 function search_content() {
     read -p "Entrez le texte recherché dans les fichiers: " text1
+    if [[ -z "$text1" ]]; then
+        error_message "Vous devez entrer un texte à rechercher."
+        search_content
+    fi
     grep -r "$text1" .
 }
 
@@ -135,7 +138,7 @@ options=(
     "Rechercher tous les fichiers d'une extension donnée dans le répertoire courant "
     "Rechercher tous les fichiers dont le nom contient une chaîne de caractères dans tous les sous-répertoires de l'arborescence du répertoire courant "
     "Produire un fichier de sortie contenant le résultat de la recherche effectuée sans écraser les résultats précédents "
-    "Proposer une fonctionnalité supplémentaire "
+    "Rechercher des fichiers en fonction de leur contenu "
     "Filtre de recherche : date, taille, nom "
     "Quitter."
 )
@@ -174,7 +177,7 @@ function search_files() {
     echo "Résultats de la recherche:"
     results=$(eval "$command" | grep -v '^.$')
     if [[ -z $results ]]; then
-        echo "Aucun fichier ne correspond aux critères de recherche."
+        error_message "Aucun fichier ne correspond aux critères de recherche."
     else
         echo "$results"
     fi
@@ -238,7 +241,7 @@ function show_filter_menu() {
             ;;
         's')
             if [[ -z filters ]]; then
-                echo "Veuillez sélectionner au moins un critère de recherche."
+                error_message "Veuillez sélectionner au moins un critère de recherche."
             else
                 search_files "$filters"
             fi
@@ -247,7 +250,7 @@ function show_filter_menu() {
             break
             ;;
         *)
-            echo "Choix invalide"
+            error_message "Choix invalide"
             ;;
         esac
 
@@ -261,244 +264,51 @@ while true; do
 
     show_menu
 
-    read -p "Entrez votre choix: " choix
+    read -p "Entrez votre choix (1-${#options[@]}): " choix
     case $choix in
         1) 
-            while true; do
-                clear
-
-                echo -e "${BOLD}1. Afficher le répertoire courant ${RESET}"
-                show_pwd
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done
-            ;;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_pwd";;
         2)  
-            while true; do
-                clear 
-
-                show_date
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done
-        ;;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_date";;
         3) 
-            while true; do
-                clear 
-
-                show_files
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done
-        ;;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_files";;
         4)  
-            while true; do
-                clear 
-
-                show_subdirs
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_subdirs";;
         5)  
-            while true; do
-                clear 
-
-                show_tree
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_tree";;
         6)  
-            while true; do
-                clear 
-
-                show_subdirs_size
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_subdirs_size";;
         7)  
-            while true; do
-                clear 
-
-                change_dir
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "change_dir";;
         8)  
-            while true; do
-                clear 
-
-                search_newer
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_newer";;
         9)  
-            while true; do
-                clear 
-
-                search_newer_all
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_newer_all";;
         10)  
-            while true; do
-                clear 
-
-                search_older
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
-        11) search_older_all 
-            while true; do
-                clear 
-
-                search_older_all
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_older";;
+        11)  
+            run_menu_option "$choice" "${options[$choix-1]}" "search_older_all";;
         12) 
-            while true; do
-                clear 
-
-                search_size_gt
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_size_gt";;
         13)  
-            while true; do
-                clear 
-
-                search_size_gt_all
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_size_gt_all";;
         14)  
-            while true; do
-                clear 
-
-                search_size_lt
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_size_lt";;
         15)  
-            while true; do
-                clear 
-
-                search_size_lt_all
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_size_lt_all";;
         16)  
-            while true; do
-                clear 
-
-                search_ext_all
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_ext_all";;
         17)  
-            while true; do
-                clear 
-
-                search_ext_main
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_ext_main";;
         18)  
-            while true; do
-                clear 
-
-                search_name_all
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_name_all";;
         19) 
-            while true; do
-                clear 
-
-                search_name_all_outfile
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done ;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_name_all_outfile";;
         20)  
-            while true; do
-                clear 
-
-                search_content
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "search_content";;
         21)  
-            while true; do
-                clear 
-
-                show_filter_menu
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done;;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_filter_menu";;
         22) exit 0 ;;
-        *) echo "Choix invalide" ;;
+        *) error_message "Choix invalide" ;;
     esac
 done

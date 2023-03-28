@@ -89,7 +89,7 @@ while true; do
             exit 0
             ;;
         *)
-            echo -e "${RED}Option invalide${RESET}"
+            echo error_message "Choix invalide"
             ;;
     esac
 done

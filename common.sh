@@ -32,3 +32,27 @@ function wait_for_user_input() {
     done
     return 0
 }
+
+function run_menu_option() {
+    local menu_option="$1"
+    local menu_text="$2"
+    local action="$3"
+
+    while true; do
+        clear
+        if [ -n "$menu_text" ]; then
+            echo -e "${BOLD}${menu_text}${RESET}"
+        fi
+        eval "$action"
+
+        wait_for_user_input
+        if [ $? = 1 ]; then
+            break # exit the while loop
+        fi
+    done
+}
+
+function error_message() {
+    local message="$1"
+    echo -e "${RED}${BOLD}Erreur: ${message}${RESET}"
+}

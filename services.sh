@@ -15,13 +15,25 @@ function list_active_services() {
 
 # c) Identifier le statut d’un service dont le nom contient une chaine de caractères (définie en paramètre)
 function check_service_status() {
-    local service_name=$1
+    read -p "$(echo -e ${CYAN}Entrez le nom du service à vérifier :${RESET}) " service_name
+
+    if [ -z $service_name ]; then # -z = empty
+        error_message "Nom de service invalide"
+        check_service_status 
+    fi
+
     systemctl status $service_name
 }
 
 # Proposer une fonctionnalité supplémentaire : redémarrer un service dont le nom contient une chaîne de caractères (définie en paramètre)
 function restart_service() {
-    local service_name=$1
+    read -p "$(echo -e ${CYAN}Entrez le nom du service à redémarrer :${RESET}) " service_name
+
+    if [ -z $service_name ]; then # -z = empty
+        error_message "Nom de service invalide"
+        restart_service
+    fi
+    
     systemctl restart $service_name
 }
 
@@ -44,83 +56,19 @@ function show_menu() {
     echo
 }
 
-# Boucle principale du programme
+
 while true; do
     clear 
 
     show_menu
     read -p "Entrez une option : " choice
 
-    # check if input is a number and if it is between 1 and 5
-    if ! [[ $choice =~ ^[1-5]$ ]]; then
-        echo -e "${RED}Option invalide${RESET}"
-        read -t 3 -p "$(echo -e ${ORANGE}Retour au menu principal dans 3 secondes...${RESET})" -n 1
-        continue
-    fi
-
     case $choice in
-        1)
-            while true; do
-                clear
-
-                echo -e "${BOLD}Services disponibles/installés :${RESET}"
-                list_services
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done
-            ;;
-        2)
-            while true; do
-                clear
-
-                echo -e "${BOLD}Services actifs :${RESET}"
-                list_active_services
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done
-            ;;
-        3)
-            while true; do
-                clear
-
-                echo -e "${BOLD}Identifier le statut d’un service :${RESET}"
-                read -p "$(echo -e ${CYAN}Entrez le nom du service à vérifier :${RESET} )" service_name
-                if [ -z "$service_name" ]; then
-                    echo -e "${RED}Nom de service invalide${RESET}"
-                else
-                    check_service_status "$service_name"
-                fi
-
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done
-            ;;
-        4)
-            while true; do
-                clear
-                read -p "$(echo -e ${CYAN}Entrez le nom du service à redémarrer :${RESET}) " service_name
-                if [ -z "$service_name" ]; then
-                    echo "${RED}Nom de service invalide${RESET}"
-                else
-                    restart_service "$service_name"
-                fi
-                
-                wait_for_user_input
-                if [ $? = 1 ]; then
-                    break # exit the while loop
-                fi
-            done
-            ;;
-        5)
-            exit 0
-            ;;
-    esac    
+        1) run_menu_option "$choice" "Services disponibles/installés :" "list_services" ;;
+        2) run_menu_option "$choice" "Services actifs :" "list_active_services" ;;
+        3) run_menu_option "$choice" "Identifier le statut d’un service :" "check_service_status" ;;
+        4) run_menu_option "$choice" "Redémarrer un service :" "restart_service";;
+        5) exit 0 ;;
+        *) error_message "Choix invalide" ;;
+    esac     
 done
