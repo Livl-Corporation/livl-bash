@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Constants for styling
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+ORANGE='\033[0;33m'
+
+
+
 # a) Identifier les services disponibles/installés sur le système
 list_services() {
     systemctl list-unit-files --type=service --no-pager
@@ -24,13 +35,14 @@ restart_service() {
 
 show_menu() {
     clear
+    echo -e "${BOLD}-----------------------"
     echo "Explorateur de services"
-    echo "-----------------------"
-    echo "1. Liste des services disponibles/installés"
-    echo "2. Liste des services actifs"
-    echo "3. Vérifier le statut d'un service"
-    echo "4. Redémarrer un service"
-    echo "5. Quitter"
+    echo -e "-----------------------${RESET}"
+    echo -e "${CYAN}1. Liste des services disponibles/installés${RESET}"
+    echo -e "${CYAN}2. Liste des services actifs${RESET}"
+    echo -e "${CYAN}3. Vérifier le statut d'un service${RESET}"
+    echo -e "${CYAN}4. Redémarrer un service${RESET}"
+    echo -e "${YELLOW}5. Quitter${RESET}"
     echo
 }
 
@@ -41,43 +53,66 @@ while true; do
 
     # check if input is a number and if it is between 1 and 5
     if ! [[ $choice =~ ^[1-5]$ ]]; then
-        echo "Option invalide"
-        read "Appuyez sur une touche pour continuer..."
+        echo -e "${RED}Option invalide${RESET}"
+        read -t 2 -p "${ORANGE}Retour au menu principal dans 2 secondes...${RESET}" -n 1
         continue
     fi
 
     case $choice in
         1)
-            list_services
-            read -p "Appuyez sur une touche pour continuer..." -n1
+            while true; do
+                clear
+                echo -e "${BOLD}Services disponibles/installés :${RESET}"
+                list_services
+                read -t 10 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
+                if [ $? = 0 ]; then # If user pressed a key
+                    break
+                fi
+            done
             ;;
         2)
-            list_active_services
-            read -p "Appuyez sur une touche pour continuer..." -n1
+            while true; do
+                clear
+                echo -e "${BOLD}Services actifs :${RESET}"
+                list_active_services
+                read -t 30 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
+                if [ $? = 0 ]; then # If user pressed a key
+                    break
+                fi
+            done
             ;;
         3)
-            read -p "Entrez le nom du service à vérifier : " service_name
-            if [ -z "$service_name" ]; then
-                echo "Nom de service invalide"
-            else
-                check_service_status "$service_name"
-            fi
-            read -p "Appuyez sur une touche pour continuer..." -n1
+            while true; do
+                clear
+                read -p "${CYAN}Entrez le nom du service à vérifier :${RESET} " service_name
+                if [ -z "$service_name" ]; then
+                    echo -e "${RED}Nom de service invalide${RESET}"
+                else
+                    check_service_status "$service_name"
+                fi
+                read -t 30 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
+                if [ $? = 0 ]; then # if user pressed a key
+                    break
+                fi
+            done
             ;;
         4)
-            read -p "Entrez le nom du service à redémarrer : " service_name
-            if [ -z "$service_name" ]; then
-                echo "Nom de service invalide"
-            else
-                restart_service "$service_name"
-            fi
-            read -p "Appuyez sur une touche pour continuer..." -n1
+            while true; do
+                clear
+                read -p "${CYAN}Entrez le nom du service à redémarrer :${RESET} " service_name
+                if [ -z "$service_name" ]; then
+                    echo "${RED}Nom de service invalide${RESET}"
+                else
+                    restart_service "$service_name"
+                fi
+                read -t 30 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
+                if [ $? = 0 ]; then # if user pressed a key
+                    break
+                fi
+            done
             ;;
         5)
             exit 0
             ;;
-    esac
-
-    # Rafraîchit l'affichage toutes les 30 secondes
-
+    esac    
 done
