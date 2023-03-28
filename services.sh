@@ -8,7 +8,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 ORANGE='\033[0;33m'
-
+REFRESH_RATE=10
 
 
 # a) Identifier les services disponibles/installés sur le système
@@ -54,6 +54,22 @@ show_menu() {
     echo
 }
 
+# Function that waits for user input and displays a message
+wait_for_user_input() {
+    echo -e "${ORANGE}Cette liste sera actualisée dans ${REFRESH_RATE} secondes. Appuyez sur une touche pour quitter immédiatement.${RESET}"
+    for i in $(seq $REFRESH_RATE -1 1); do
+        echo -ne "\rActualisation dans ${YELLOW}$i${RESET} seconde(s)..."
+        sleep 1 &
+        # if user pressed a key, we exit the loop
+        read -t 1 -n 1 input
+        if [ $? = 0 ]; then
+            return 1
+        fi
+    done
+    return 0
+}
+
+
 # Boucle principale du programme
 while true; do
     show_menu
@@ -62,7 +78,7 @@ while true; do
     # check if input is a number and if it is between 1 and 5
     if ! [[ $choice =~ ^[1-5]$ ]]; then
         echo -e "${RED}Option invalide${RESET}"
-        read -t 2 -p "${ORANGE}Retour au menu principal dans 2 secondes...${RESET}" -n 1
+        read -t 3 -p "$(echo -e ${ORANGE}Retour au menu principal dans 3 secondes...${RESET})" -n 1
         continue
     fi
 
@@ -70,52 +86,60 @@ while true; do
         1)
             while true; do
                 clear
+
                 echo -e "${BOLD}Services disponibles/installés :${RESET}"
                 list_services
-                read -t 10 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
-                if [ $? = 0 ]; then # If user pressed a key
-                    break
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
                 fi
             done
             ;;
         2)
             while true; do
                 clear
+
                 echo -e "${BOLD}Services actifs :${RESET}"
                 list_active_services
-                read -t 30 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
-                if [ $? = 0 ]; then # If user pressed a key
-                    break
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
                 fi
             done
             ;;
         3)
             while true; do
                 clear
-                read -p "${CYAN}Entrez le nom du service à vérifier :${RESET} " service_name
+
+                echo -e "${BOLD}Identifier le statut d’un service :${RESET}"
+                read -p "$(echo -e ${CYAN}Entrez le nom du service à vérifier :${RESET} )" service_name
                 if [ -z "$service_name" ]; then
                     echo -e "${RED}Nom de service invalide${RESET}"
                 else
                     check_service_status "$service_name"
                 fi
-                read -t 30 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
-                if [ $? = 0 ]; then # if user pressed a key
-                    break
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
                 fi
             done
             ;;
         4)
             while true; do
                 clear
-                read -p "${CYAN}Entrez le nom du service à redémarrer :${RESET} " service_name
+                read -p "$(echo -e ${CYAN}Entrez le nom du service à redémarrer :${RESET}) " service_name
                 if [ -z "$service_name" ]; then
                     echo "${RED}Nom de service invalide${RESET}"
                 else
                     restart_service "$service_name"
                 fi
-                read -t 30 -p "$(echo -e ${CYAN}Appuyez sur une touche pour continuer...${RESET})" -n 1 input
-                if [ $? = 0 ]; then # if user pressed a key
-                    break
+                
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
                 fi
             done
             ;;
