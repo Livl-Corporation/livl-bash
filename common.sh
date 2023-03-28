@@ -9,6 +9,7 @@ BOLD='\033[1m'
 RESET='\033[0m'
 ORANGE='\033[0;33m'
 BLINK='\033[5m'
+UNDERLINE='\033[4m'
 
 # Constants for the script refresh rate
 REFRESH_RATE=30
@@ -42,7 +43,7 @@ function run_menu_option() {
     while true; do
         clear
         if [ -n "$menu_text" ]; then
-            echo -e "${CYAN}${BOLD}${menu_text}${RESET}\n"
+            echo -e "${CYAN}${BOLD}${UNDERLINE}${menu_text}:${RESET}\n"
         fi
         eval "$action"
 

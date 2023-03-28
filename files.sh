@@ -118,30 +118,7 @@ function search_content() {
 }
 
 # Définition des options du menu
-options=(
-    "Afficher le répertoire courant "
-    "Afficher la date et l'heure du système "
-    "Afficher le nombre de fichiers et leur taille dans le répertoire courant "
-    "Afficher le nombre de sous-répertoires dans le répertoire courant "
-    "Afficher l'arborescence du répertoire courant avec une profondeur paramétrable "
-    "Afficher le poids de chaque sous-répertoire dans le répertoire courant "
-    "Changer le répertoire courant "
-    "Rechercher les fichiers plus récents qu'une date donnée dans le répertoire courant "
-    "Rechercher les fichiers plus récents qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
-    "Rechercher les fichiers plus anciens qu'une date donnée dans le répertoire courant "
-    "Rechercher les fichiers plus anciens qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
-    "Rechercher les fichiers de poids supérieur à une valeur donnée dans le répertoire courant "
-    "Rechercher les fichiers de poids supérieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
-    "Rechercher les fichiers de poids inférieur à une valeur donnée dans le répertoire courant "
-    "Rechercher les fichiers de poids inférieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
-    "Rechercher tous les fichiers d'une extension donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
-    "Rechercher tous les fichiers d'une extension donnée dans le répertoire courant "
-    "Rechercher tous les fichiers dont le nom contient une chaîne de caractères dans tous les sous-répertoires de l'arborescence du répertoire courant "
-    "Produire un fichier de sortie contenant le résultat de la recherche effectuée sans écraser les résultats précédents "
-    "Rechercher des fichiers en fonction de leur contenu "
-    "Filtre de recherche : date, taille, nom "
-    "Quitter."
-)
+options=( "Afficher le répertoire courant " "Afficher la date et l'heure du système " "Afficher le nombre de fichiers et leur taille dans le répertoire courant " "Afficher le nombre de sous-répertoires dans le répertoire courant " "Afficher l'arborescence du répertoire courant avec une profondeur paramétrable " "Afficher le poids de chaque sous-répertoire dans le répertoire courant " "Changer le répertoire courant " "Rechercher les fichiers plus récents qu'une date donnée dans le répertoire courant " "Rechercher les fichiers plus récents qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers plus anciens qu'une date donnée dans le répertoire courant " "Rechercher les fichiers plus anciens qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers de poids supérieur à une valeur donnée dans le répertoire courant " "Rechercher les fichiers de poids supérieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers de poids inférieur à une valeur donnée dans le répertoire courant " "Rechercher les fichiers de poids inférieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher tous les fichiers d'une extension donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher tous les fichiers d'une extension donnée dans le répertoire courant " "Rechercher tous les fichiers dont le nom contient une chaîne de caractères dans tous les sous-répertoires de l'arborescence du répertoire courant " "Produire un fichier de sortie contenant le résultat de la recherche effectuée sans écraser les résultats précédents " "Rechercher des fichiers en fonction de leur contenu " "Filtre de recherche : date, taille, nom " "Quitter." )
 
 # Fonction pour afficher le menu
 function show_menu() {
@@ -253,7 +230,7 @@ while true; do
 
     show_menu
     read -p "Entrez votre choix (1-${#options[@]}): " choix
-    
+
     case $choix in
         1) 
             run_menu_option "$choice" "${options[$choix-1]}" "show_pwd";;
