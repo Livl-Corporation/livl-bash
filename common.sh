@@ -8,6 +8,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 ORANGE='\033[0;33m'
+BLINK='\033[5m'
 
 # Constants for the script refresh rate
 REFRESH_RATE=30
@@ -16,8 +17,12 @@ REFRESH_RATE=30
 function wait_for_user_input() {
     echo ""
     echo -e "${ORANGE}Cette liste sera actualisée dans ${REFRESH_RATE} secondes. Appuyez sur une touche pour quitter immédiatement.${RESET}"
-    for i in $(seq $REFRESH_RATE -1 1); do
-        echo -ne "\rActualisation dans ${YELLOW}$i${RESET} seconde(s)... "
+    for i in $(seq $REFRESH_RATE -1 1); do # decrease from REFRESH_RATE to 1
+        if [ $(($i % 2)) -eq 0 ]; then
+            echo -ne "\r${CYAN}Actualisation dans ${GREEN}$i${CYAN} seconde(s)... ${RESET}"
+        else
+            echo -ne "\r${BLINK}${CYAN}Actualisation dans ${RED}$i${CYAN} seconde(s)... ${RESET}"
+        fi
         sleep 1 &
         # if user pressed a key, we exit the loop
         read -t 1 -n 1 input
