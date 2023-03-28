@@ -12,28 +12,28 @@ REFRESH_RATE=30
 
 
 # a) Identifier les services disponibles/installés sur le système
-list_services() {
+function list_services() {
     systemctl list-unit-files --type=service --no-pager
 }
 
 # b) Identifier les services actifs sur le système
-list_active_services() {
+function list_active_services() {
     systemctl list-units --type=service --state=active --no-pager
 }
 
 # c) Identifier le statut d’un service dont le nom contient une chaine de caractères (définie en paramètre)
-check_service_status() {
+function check_service_status() {
     local service_name=$1
     systemctl status $service_name
 }
 
 # Proposer une fonctionnalité supplémentaire : redémarrer un service dont le nom contient une chaîne de caractères (définie en paramètre)
-restart_service() {
+function restart_service() {
     local service_name=$1
     systemctl restart $service_name
 }
 
-show_menu() {
+function show_menu() {
     clear
     
     echo -e "${RED}${BOLD}   _____ __________ _    __________________   ${YELLOW}_______  __ ____  __    ____  ____  __________  "
@@ -53,10 +53,11 @@ show_menu() {
 }
 
 # Function that waits for user input and displays a message
-wait_for_user_input() {
+function wait_for_user_input() {
+    echo ""
     echo -e "${ORANGE}Cette liste sera actualisée dans ${REFRESH_RATE} secondes. Appuyez sur une touche pour quitter immédiatement.${RESET}"
     for i in $(seq $REFRESH_RATE -1 1); do
-        echo -ne "\rActualisation dans ${YELLOW}$i${RESET} seconde(s)..."
+        echo -ne "\rActualisation dans ${YELLOW}$i${RESET} seconde(s)... "
         sleep 1 &
         # if user pressed a key, we exit the loop
         read -t 1 -n 1 input
@@ -70,6 +71,8 @@ wait_for_user_input() {
 
 # Boucle principale du programme
 while true; do
+    clear 
+
     show_menu
     read -p "Entrez une option : " choice
 

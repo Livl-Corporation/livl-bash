@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Constants for styling
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+ORANGE='\033[0;33m'
+REFRESH_RATE=10
+
 # a) Afficher le répertoire courant
 function show_pwd() {
     pwd
@@ -114,38 +124,68 @@ function search_content() {
 
 # Définition des options du menu
 options=(
-        "Afficher le répertoire courant dans lequel je me trouve ;"
-        "Indiquez la date et l’heure du système ;"
-        "Indiquer le nombre de fichiers présents dans le répertoire courant et leur taille (en Ko,Mo ou Go à vous de définir l’unité la plus pertinente) ;"
-        "Indiquer le nombre de sous-répertoires présents dans le répertoire courant ;"
-        "Indiquer l’arborescence (en permettant de paramétrer une profondeur) du répertoire courant ;"
-        "Indiquer le poids (quantité de données) de chaque sous-répertoire du répertoire courant (veiller à comptabiliser tous les fichiers présents dans l’arborescence de chaque sous répertoire) ;"
-        "Changer de répertoire courant pour poursuivre mes investigations ;"
-        "Rechercher les fichiers plus récents qu’une date (définie en paramètre) pour le répertoire courant ;"
-        "Rechercher les fichiers plus récents qu’une date (définie en paramètre) présents dans tous les sous-répertoires de l’arborescence du répertoire courant ;"
-        "Rechercher les fichiers plus anciens qu’une date (définie en paramètre) pour le répertoire courant ;"
-        "Rechercher les fichiers plus anciens qu’une date (définie en paramètre) présents dans tous les sous-répertoires de l’arborescence du répertoire courant ;"
-        "Rechercher les fichiers de poids supérieur à une valeur indiquée présents dans le répertoire courant ;"
-        "Rechercher les fichiers de poids supérieur à une valeur présents dans tous les sousrépertoires de l’arborescence du répertoire courant ;"
-        "Rechercher les fichiers de poids inférieur à une valeur indiquée présents dans le répertoire courant ;"
-        "Rechercher les fichiers de poids inférieur à une valeur indiquée présents dans tous les sous-répertoires de l’arborescence du répertoire courant ;"
-        "Rechercher tous les fichiers d’une extension donnée (définie en paramètre) présents dans tous les sous-répertoires de l’arborescence du répertoire courant ;"
-        "Rechercher tous les fichiers d’une extension donnée (définie en paramètre) présents dans le répertoire courant ;"
-        "Rechercher tous les fichiers dont le nom contient une chaine de caractère (définie en paramètre) présents dans tous les sous-répertoires de l’arborescence du répertoire courant ;"
-        "Produire un fichier de sortie contenant le résultat de la recherche effectuée qui n’écrase pas les résultats de la recherche précédente (tenir compte par exemple de la date et l’heure système)"
-        "Proposer une fonctionnalité supplémentaire que vous jugez intéressante et qui manque à la liste précédente (argumentez votre choix)"
-        "Filtre de recherche: date - taille - nom"
-        "Quitter")
+    "Afficher le répertoire courant "
+    "Afficher la date et l'heure du système "
+    "Afficher le nombre de fichiers et leur taille dans le répertoire courant "
+    "Afficher le nombre de sous-répertoires dans le répertoire courant "
+    "Afficher l'arborescence du répertoire courant avec une profondeur paramétrable "
+    "Afficher le poids de chaque sous-répertoire dans le répertoire courant "
+    "Changer le répertoire courant "
+    "Rechercher les fichiers plus récents qu'une date donnée dans le répertoire courant "
+    "Rechercher les fichiers plus récents qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
+    "Rechercher les fichiers plus anciens qu'une date donnée dans le répertoire courant "
+    "Rechercher les fichiers plus anciens qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
+    "Rechercher les fichiers de poids supérieur à une valeur donnée dans le répertoire courant "
+    "Rechercher les fichiers de poids supérieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
+    "Rechercher les fichiers de poids inférieur à une valeur donnée dans le répertoire courant "
+    "Rechercher les fichiers de poids inférieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
+    "Rechercher tous les fichiers d'une extension donnée dans tous les sous-répertoires de l'arborescence du répertoire courant "
+    "Rechercher tous les fichiers d'une extension donnée dans le répertoire courant "
+    "Rechercher tous les fichiers dont le nom contient une chaîne de caractères dans tous les sous-répertoires de l'arborescence du répertoire courant "
+    "Produire un fichier de sortie contenant le résultat de la recherche effectuée sans écraser les résultats précédents "
+    "Proposer une fonctionnalité supplémentaire "
+    "Filtre de recherche : date, taille, nom "
+    "Quitter."
+)
 
 # Fonction pour afficher le menu
-show_menu() {
-    echo "========================================"
-    echo "Menu principal"
-    echo "========================================"
+function show_menu() {
+
+    echo -e "${RED}${BOLD}    ____________    ______   ${YELLOW}_______  __ ____  __    ____  ____  __________  "
+    echo -e "${RED}   / ____/  _/ /   / ____/  ${YELLOW}/ ____/ |/ // __ \/ /   / __ \/ __ \/ ____/ __ \ "
+    echo -e "${RED}  / /_   / // /   / __/    ${YELLOW}/ __/  |   // /_/ / /   / / / / /_/ / __/ / /_/ / "
+    echo -e "${RED} / __/ _/ // /___/ /___   ${YELLOW}/ /___ /   |/ ____/ /___/ /_/ / _, _/ /___/ _, _/  "
+    echo -e "${RED}/_/   /___/_____/_____/  ${YELLOW}/_____//_/|_/_/   /_____/\____/_/ |_/_____/_/ |_|   ${RESET}"
+
+    echo -e ""  
+    echo -e "" 
+
     for index in "${!options[@]}"; do
-        echo "$((index+1)). ${options[$index]}"
+        printf -v padded_index "%02d" $(($index+1))
+        # if we come to the last element of array, we change its color
+        if [[ $index -eq $((${#options[@]}-1)) ]]; then
+            echo -e "${ORANGE}${padded_index}. ${options[$index]}${RESET}"
+            break 2
+        fi
+        echo -e "${CYAN}${padded_index}. ${options[$index]}${RESET}"
     done
-    echo "========================================"
+    echo -e ""
+}
+
+# Function that waits for user input and displays a message
+function wait_for_user_input() {
+    echo ""
+    echo -e "${ORANGE}Cette liste sera actualisée dans ${REFRESH_RATE} secondes. Appuyez sur une touche pour quitter immédiatement.${RESET}"
+    for i in $(seq $REFRESH_RATE -1 1); do
+        echo -ne "\rActualisation dans ${YELLOW}$i${RESET} seconde(s)... "
+        sleep 1 &
+        # if user pressed a key, we exit the loop
+        read -t 1 -n 1 input
+        if [ $? = 0 ]; then
+            return 1
+        fi
+    done
+    return 0
 }
 
 function search_files() {
@@ -241,31 +281,247 @@ function show_filter_menu() {
 
 # Menu interactif
 while true; do
+    clear
+
     show_menu
 
     read -p "Entrez votre choix: " choix
     case $choix in
-        1) show_pwd ;;
-        2) show_date ;;
-        3) show_files ;;
-        4) show_subdirs ;;
-        5) show_tree ;;
-        6) show_subdirs_size ;;
-        7) change_dir ;;
-        8) search_newer ;;
-        9) search_newer_all ;;
-        10) search_older ;;
-        11) search_older_all ;;
-        12) search_size_gt ;;
-        13) search_size_gt_all ;;
-        14) search_size_lt ;;
-        15) search_size_lt_all ;;
-        16) search_ext_all ;;
-        17) search_ext_main ;;
-        18) search_name_all ;;
-        19) search_name_all_outfile ;;
-        20) search_content ;;
-        21) show_filter_menu ;;
+        1) 
+            while true; do
+                clear
+
+                echo -e "${BOLD}1. Afficher le répertoire courant ${RESET}"
+                show_pwd
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done
+            ;;
+        2)  
+            while true; do
+                clear 
+
+                show_date
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done
+        ;;
+        3) 
+            while true; do
+                clear 
+
+                show_files
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done
+        ;;
+        4)  
+            while true; do
+                clear 
+
+                show_subdirs
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        5)  
+            while true; do
+                clear 
+
+                show_tree
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        6)  
+            while true; do
+                clear 
+
+                show_subdirs_size
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        7)  
+            while true; do
+                clear 
+
+                change_dir
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        8)  
+            while true; do
+                clear 
+
+                search_newer
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        9)  
+            while true; do
+                clear 
+
+                search_newer_all
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        10)  
+            while true; do
+                clear 
+
+                search_older
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        11) search_older_all 
+            while true; do
+                clear 
+
+                search_older_all
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        12) 
+            while true; do
+                clear 
+
+                search_size_gt
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        13)  
+            while true; do
+                clear 
+
+                search_size_gt_all
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        14)  
+            while true; do
+                clear 
+
+                search_size_lt
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        15)  
+            while true; do
+                clear 
+
+                search_size_lt_all
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        16)  
+            while true; do
+                clear 
+
+                search_ext_all
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        17)  
+            while true; do
+                clear 
+
+                search_ext_main
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        18)  
+            while true; do
+                clear 
+
+                search_name_all
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        19) 
+            while true; do
+                clear 
+
+                search_name_all_outfile
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done ;;
+        20)  
+            while true; do
+                clear 
+
+                search_content
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
+        21)  
+            while true; do
+                clear 
+
+                show_filter_menu
+
+                wait_for_user_input
+                if [ $? = 1 ]; then
+                    break # exit the while loop
+                fi
+            done;;
         22) exit 0 ;;
         *) echo "Choix invalide" ;;
     esac
