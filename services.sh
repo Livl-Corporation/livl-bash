@@ -37,6 +37,9 @@ function restart_service() {
     systemctl restart $service_name
 }
 
+# Définition des options du menu
+options=( "Liste des services disponibles/installés" "Liste des services actifs" "Vérifier le statut d'un service" "Redémarrer un service" "Quitter" )
+
 function show_menu() {
     clear
     
@@ -46,14 +49,9 @@ function show_menu() {
     echo -e "${RED} ___/ / /___/ _  _/| |/ // // /___/ /___   ${YELLOW}/ /___ /   |/ ____/ /___/ /_/ / _  _/ /___/ _, _/  "
     echo -e "${RED}/____/_____/_/ |_| |___/___/\____/_____/  ${YELLOW}/_____//_/|_/_/   /_____/\____/_/ |_/_____/_/ |_|   "
     echo -e "                                                                                             ${RESET}"
+    
 
-    echo ""
-    echo -e "${CYAN}1. Liste des services disponibles/installés${RESET}"
-    echo -e "${CYAN}2. Liste des services actifs${RESET}"
-    echo -e "${CYAN}3. Vérifier le statut d'un service${RESET}"
-    echo -e "${CYAN}4. Redémarrer un service${RESET}"
-    echo -e "${YELLOW}5. Quitter${RESET}"
-    echo
+    display_list_of_option "${options[@]}"
 }
 
 
@@ -61,13 +59,13 @@ while true; do
     clear 
 
     show_menu
-    read -p "Entrez une option : " choice
+    read -p "Entrez votre choix (1-${#options[@]}): " choice
 
     case $choice in
-        1) run_menu_option "$choice" "Services disponibles/installés :" "list_services" ;;
-        2) run_menu_option "$choice" "Services actifs :" "list_active_services" ;;
-        3) run_menu_option "$choice" "Identifier le statut d’un service :" "check_service_status" ;;
-        4) run_menu_option "$choice" "Redémarrer un service :" "restart_service";;
+        1) run_menu_option "$choice" "${options[$choice-1]}" "list_services" ;;
+        2) run_menu_option "$choice" "${options[$choice-1]}" "st_active_services" ;;
+        3) run_menu_option "$choice" "${options[$choice-1]}" "check_service_status" ;;
+        4) run_menu_option "$choice" "${options[$choice-1]}" "restart_service";;
         5) exit 0 ;;
         *) error_message "Choix invalide" ;;
     esac     

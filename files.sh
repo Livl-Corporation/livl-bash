@@ -152,19 +152,8 @@ function show_menu() {
     echo -e "${RED} / __/ _/ // /___/ /___   ${YELLOW}/ /___ /   |/ ____/ /___/ /_/ / _, _/ /___/ _, _/  "
     echo -e "${RED}/_/   /___/_____/_____/  ${YELLOW}/_____//_/|_/_/   /_____/\____/_/ |_/_____/_/ |_|   ${RESET}"
 
-    echo -e ""  
-    echo -e "" 
+    display_list_of_option "${options[@]}"
 
-    for index in "${!options[@]}"; do
-        printf -v padded_index "%02d" $(($index+1))
-        # if we come to the last element of array, we change its color
-        if [[ $index -eq $((${#options[@]}-1)) ]]; then
-            echo -e "${ORANGE}${padded_index}. ${options[$index]}${RESET}"
-            break 2
-        fi
-        echo -e "${CYAN}${padded_index}. ${options[$index]}${RESET}"
-    done
-    echo -e ""
 }
 
 function search_files() {
@@ -263,8 +252,8 @@ while true; do
     clear
 
     show_menu
-
     read -p "Entrez votre choix (1-${#options[@]}): " choix
+    
     case $choix in
         1) 
             run_menu_option "$choice" "${options[$choix-1]}" "show_pwd";;

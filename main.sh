@@ -29,7 +29,6 @@ header()
 
 
 while true; do
-    
     clear
 
     header

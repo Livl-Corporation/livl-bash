@@ -13,7 +13,7 @@ BLINK='\033[5m'
 # Constants for the script refresh rate
 REFRESH_RATE=30
 
-# Function that waits for user input and displays a message
+# Function that waits for user input and displays a message each second before refreshing the screen
 function wait_for_user_input() {
     echo ""
     echo -e "${ORANGE}Cette liste sera actualisée dans ${REFRESH_RATE} secondes. Appuyez sur une touche pour quitter immédiatement.${RESET}"
@@ -33,6 +33,7 @@ function wait_for_user_input() {
     return 0
 }
 
+# Function that runs a menu option and waits for user input
 function run_menu_option() {
     local menu_option="$1"
     local menu_text="$2"
@@ -41,7 +42,7 @@ function run_menu_option() {
     while true; do
         clear
         if [ -n "$menu_text" ]; then
-            echo -e "${BOLD}${menu_text}${RESET}"
+            echo -e "${CYAN}${BOLD}${menu_text}${RESET}\n"
         fi
         eval "$action"
 
@@ -52,7 +53,28 @@ function run_menu_option() {
     done
 }
 
+# Function that displays an error message
 function error_message() {
     local message="$1"
     echo -e "${RED}${BOLD}Erreur: ${message}${RESET}"
+}
+
+
+# Function that displays a list of options menu for the user to choose from
+function display_list_of_option()
+{
+    local options=("$@") 
+    
+    echo ""
+    for index in "${!options[@]}"; do
+    printf -v padded_index "%02d" $(($index+1))
+    # if we come to the last element of array, we change its color
+    if [[ $index -eq $((${#options[@]}-1)) ]]; then
+        echo -e "${ORANGE}${padded_index}. ${options[$index]}${RESET}"
+        break 2
+    fi
+    echo -e "${CYAN}${padded_index}. ${options[$index]}${RESET}"
+    done
+
+    echo ""
 }
