@@ -8,7 +8,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 ORANGE='\033[0;33m'
-REFRESH_RATE=10
+REFRESH_RATE=30
 
 
 # a) Identifier les services disponibles/installés sur le système
