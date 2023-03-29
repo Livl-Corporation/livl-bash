@@ -16,15 +16,16 @@
 
 #### **Filtres**
 
-**Difficultés**
+##### **Difficultés**
+
 La consigne sur l'implémentation d'un système de filtre n'étant pas très détaillé, nous avons dû en faire notre propre interprétation.
 Nous avons choisi un menu permettant de sélectionner les filtres souhaités de manière intéractive.
 Cette partie permettant à l'utilisateur de définir des filtres fut plus complexe que la mise en place du filtrage lui même.
 La grande flexibilité de la commande find nous a permis de traduire les entrées de l'utilisateur en commande `find` facilement.
 
-**Limitations**
+##### **Limitations**
 
-**Extensions**
+##### **Extensions**
 
 ### Partie 2 : Processus
 
@@ -32,11 +33,11 @@ La grande flexibilité de la commande find nous a permis de traduire les entrée
 
 #### **Filtres**
 
-**Difficultés**
+##### **Difficultés**
 
-**Limitations**
+##### **Limitations**
 
-**Extensions**
+##### **Extensions**
 
 ### Partie 3 : Services
 
