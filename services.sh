@@ -63,7 +63,7 @@ while true; do
 
     case $choice in
         1) run_menu_option "$choice" "${options[$choice-1]}" "list_services" ;;
-        2) run_menu_option "$choice" "${options[$choice-1]}" "st_active_services" ;;
+        2) run_menu_option "$choice" "${options[$choice-1]}" "list_active_services" ;;
         3) run_menu_option "$choice" "${options[$choice-1]}" "check_service_status" ;;
         4) run_menu_option "$choice" "${options[$choice-1]}" "restart_service";;
         5) exit 0 ;;

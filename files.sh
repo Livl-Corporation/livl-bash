@@ -20,12 +20,9 @@ function show_subdirs() {
 }
 # e) Indiquer l’arborescence du répertoire courant avec une profondeur paramétrable
 function show_tree() {
-    read -p "Entrez la profondeur souhaitée pour l'arborescence: " depth
-    if [[ ! "$depth" =~ ^[0-9]+$ ]]; then
-        error_message "La profondeur doit être un nombre entier positif."
-        show_tree
-    fi
-    find . -maxdepth $depth
+    ask_for_number "Entrez la profondeur souhaitée pour l'arborescence: "
+    depth=$?
+    find . -maxdepth $depth -type d -print | sed -e "s;[^/]*/;|____;g;s;____|; |;g" 
 }
 # f) Indiquer le poids de chaque sous-répertoire du répertoire courant
 function show_subdir_sizes() {
@@ -35,86 +32,86 @@ function show_subdir_sizes() {
 }
 # g) Changer de répertoire courant pour poursuivre mes investigations
 function change_dir() {
-    read -p "Entrez le chemin du répertoire dans lequel vous voulez aller: " newdir
-    if [[ ! -d "$newdir" ]]; then
-        error_message "Le répertoire spécifié n'existe pas."
-        change_dir
-    fi
+    ask_for_string "Entrez le chemin du répertoire dans lequel vous voulez aller:"
+    newdir=$?
     cd "$newdir"
 }
 # h) Rechercher les fichiers plus récents qu’une date pour le répertoire courant 
 function search_newer() {
-    read -p "Entrez la date (au format YYYY-MM-DD): " date
+    ask_for_date
+    date=$?
     find . -maxdepth 1 -type f ! -newermt $date
 }
 # i) Rechercher les fichiers plus récents qu’une date présents dans tous les sous-répertoires de l’arborescence du répertoire courant 
 function search_newer_all() {
-    read -p "Entrez la date (au format YYYY-MM-DD): " date2
-    find . ! -newermt $date2
+    ask_for_date
+    date=$?
+    find . ! -newermt $date
 }
 # j) Rechercher les fichiers plus anciens qu’une date pour le répertoire courant
 function search_older() {
-    read -p "Entrez la date (au format YYYY-MM-DD): " date3
-    find . -maxdepth 1 -type f -newermt $date3
+    ask_for_date 
+    date=$?
+    find . -maxdepth 1 -type f -newermt $date
 }
 # k) Rechercher les fichiers plus anciens qu’une date présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_older_all() {
-    read -p "Entrez la date (au format YYYY-MM-DD): " date4
-    find . -type f -newermt $date4
+    ask_for_date 
+    date=$?
+    find . -type f -newermt $date
 }
 # l) Rechercher les fichiers de poids supérieur à une valeur indiquée présents dans le répertoire courant
 function search_size_gt() {
-    read -p "Entrez la taille minimale des fichiers (en Ko): " size
+    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
+    size=$?
     find . -maxdepth 1 -type f -size +${size}k
 }
 # m) Rechercher les fichiers de poids supérieur à une valeur présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_size_gt_all() {
-    read -p "Entrez la taille minimale des fichiers (en Ko): " size2
-    find . -type f -size +${size2}k
+    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
+    size=$?
+    find . -type f -size +${size}k
 }
 # n) Rechercher les fichiers de poids inférieur à une valeur indiquée présents dans le répertoire courant
 function search_size_lt() {
-    read -p "Entrez la taille maximale des fichiers (en Ko): " size3
-    find . -maxdepth 1 -type f -size -${size3}k
+    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
+    size=$?
+    find . -maxdepth 1 -type f -size -${size}k
 }
 # o) Rechercher les fichiers de poids inférieur à une valeur indiquée présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_size_lt_all() {
-    read -p "Entrez la taille maximale des fichiers (en Ko): " size4
-    find . -type f -size -${size4}k
+    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
+    size=$?
+    find . -type f -size -${size}k
 }
 # p) Rechercher tous les fichiers d’une extension donnée présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_ext_all() {
-    read -p "Entrez l'extension des fichiers recherchés: " ext1
-    find . -type f -name "*.$ext1"
+    ext=$(ask_for_string "Entrez l'extension des fichiers recherchés: ") 
+    echo "Fichiers avec l'extension .$ext :"
+    find . -type f -name "*.$ext"
 }
 # q) Rechercher tous les fichiers d’une extension donnée présents dans le répertoire courant 
 function search_ext_main() {
-    read -p "Entrez l'extension des fichiers recherchés: " ext2
-    find . -maxdepth 1 -type f -name "*.$ext2"
+    ext=$(ask_for_string "Entrez la chaine de caractères recherchée: ")
+    find . -maxdepth 1 -type f -name "*.$ext"
 }
 
 # r) Rechercher tous les fichiers dont le nom contient une chaine de caractère présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_name_all() {
-    read -p "Entrez la chaine de caractères recherchée: " string1
-    find . -type f -name "*$string1*"
+    string=$(ask_for_string "Entrez la chaine de caractères recherchée: ")
+    find . -type f -name "*$string*"
 }
 
 # s) Produire un fichier de sortie contenant le résultat de la recherche effectuée qui n’écrase pas les résultats de la recherche précédente
 function search_name_all_outfile() {
-    read -p "Entrez le nom du fichier de sortie: " outfile
-    datestr=$(date +"%Y%m%d%H%M%S")
-    outfile="${outfile}_${datestr}.txt"
-    find . > $outfile
+    string=$(ask_for_string "Entrez la chaine de caractères recherchée: ")
+    find . -type f -name "*$string*" > search_results.txt
 }
 
 # t) Rechercher des fichiers en fonction de leur contenu
 function search_content() {
-    read -p "Entrez le texte recherché dans les fichiers: " text1
-    if [[ -z "$text1" ]]; then
-        error_message "Vous devez entrer un texte à rechercher."
-        search_content
-    fi
-    grep -r "$text1" .
+    text=$(ask_for_string "Entrez le texte recherché dans les fichiers: ")
+    grep -r "$text" .
 }
 
 # Définition des options du menu
@@ -122,7 +119,6 @@ options=( "Afficher le répertoire courant " "Afficher la date et l'heure du sys
 
 # Fonction pour afficher le menu
 function show_menu() {
-
     echo -e "${RED}${BOLD}    ____________    ______   ${YELLOW}_______  __ ____  __    ____  ____  __________  "
     echo -e "${RED}   / ____/  _/ /   / ____/  ${YELLOW}/ ____/ |/ // __ \/ /   / __ \/ __ \/ ____/ __ \ "
     echo -e "${RED}  / /_   / // /   / __/    ${YELLOW}/ __/  |   // /_/ / /   / / / / /_/ / __/ / /_/ / "
@@ -130,7 +126,6 @@ function show_menu() {
     echo -e "${RED}/_/   /___/_____/_____/  ${YELLOW}/_____//_/|_/_/   /_____/\____/_/ |_/_____/_/ |_|   ${RESET}"
 
     display_list_of_option "${options[@]}"
-
 }
 
 function search_files() {
@@ -165,7 +160,7 @@ function show_filter_menu() {
             echo " [e] Ajouter un filtre OU"
             echo " [s] Lancer la recherche avec les critères sélectionnés"
             echo " [m] Retour au menu principal"
-            read -p "Entrez votre choix: " choix
+            choix_mode=$(ask_for_string "Entrez une lettre: ")
 
             # Selection du mode de filtre
             if [[ $choix_mode == "a" ]]; then
@@ -187,22 +182,30 @@ function show_filter_menu() {
             echo "- Actions -"
             echo "  [s] Lancer la recherche avec les critères sélectionnés"
             echo "  [m] Retour au menu principal"
-            read -p "Entrez votre choix: " choix
+
+            choix=$(ask_for_string "Entrez une lettre: ")
         fi
         
         case $choix in
         'n')
-            read -p "Nom de fichier: " file_name 
+            file_name=$(ask_for_string "Nom de fichier: ") 
             filters+=" $mode -name '$file_name'"
             ;;
         'i')
-            read -p "Taille minimale (en Ko): " min_size
-            read -p "Taille maximale (en Ko): " max_size
+            ask_for_number "Taille minimale (en Ko): " min_size
+            min_size=$?
+            ask_for_number "Taille maximale (en Ko): " max_size
+            max_size=$?
             filters+=" $mode -size +${min_size}k -size -${max_size}k"
             ;;
         'd')
-            read -p "Date minimale (format: YYYY-MM-DD): " min_date
-            read -p "Date maximale (format: YYYY-MM-DD): " max_date
+            ask_for_date "Date minimale (format: YYYY-MM-DD): " min_date
+            ask_for_date "Date maximale (format: YYYY-MM-DD): " max_date
+            check_correct_date "$min_date" "$max_date"
+            if [[ $? -eq 1 ]]; then
+                error_message "La date minimale doit être antérieure à la date maximale."
+                continue
+            fi
             filters+=" $mode -newermt '$min_date' ! -newermt '$max_date'"
             ;;
         's')
@@ -243,7 +246,7 @@ while true; do
         5)  
             run_menu_option "$choice" "${options[$choix-1]}" "show_tree";;
         6)  
-            run_menu_option "$choice" "${options[$choix-1]}" "show_subdirs_size";;
+            run_menu_option "$choice" "${options[$choix-1]}" "show_subdir_sizes";;
         7)  
             run_menu_option "$choice" "${options[$choix-1]}" "change_dir";;
         8)  

@@ -60,6 +60,76 @@ function error_message() {
     echo -e "${RED}${BOLD}Erreur: ${message}${RESET}"
 }
 
+function ask_for_string()
+{
+    local string
+    local textToDisplay="$1"
+    while true; do
+        read -p "$textToDisplay" string
+        if [ -z "$string" ]; then
+            error_message "La chaîne de caractères ne peut pas être vide."
+            continue
+        else
+            echo "$string"
+            break
+        fi
+    done
+}
+
+function ask_for_number()
+{
+    local number
+    local textToDisplay="$1"
+    while true; do
+        read -p "$textToDisplay" number
+        if [[ $number =~ ^[0-9]+$ ]]; then
+            return $number
+        else
+            error_message "Le nombre doit être un entier positif."
+        fi
+    done
+}
+
+function ask_for_date() {
+    local date
+    local textToDisplay="$1"
+
+    if [ -z "$textToDisplay" ]; then
+        textToDisplay="Entrez la date (au format YYYY-MM-DD): "
+    fi
+
+    while true; do
+        read -p "$textToDisplay" date
+        check_correct_date "$date"
+        if [ $? = 0 ]; then
+            return $date
+        fi
+    done
+}
+
+function check_correct_date()
+{
+    local date="$1"
+
+    if [[ $date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        local year=$(echo $date | cut -d'-' -f1)
+        local month=$(echo $date | cut -d'-' -f2)
+        local day=$(echo $date | cut -d'-' -f3)
+        if [[ $month -gt 0 && $month -le 12 ]]; then
+            if [[ $day -gt 0 && $day -le 31 ]]; then
+                return 0
+            else 
+                error_message "Le jour doit être compris entre 1 et 31."
+            fi
+        else 
+            error_message "Le mois doit être compris entre 1 et 12."
+        fi
+    else
+        error_message "La date doit être au format YYYY-MM-DD."
+    fi
+     
+    return 1
+}
 
 # Function that displays a list of options menu for the user to choose from
 function display_list_of_option()
@@ -72,7 +142,7 @@ function display_list_of_option()
     # if we come to the last element of array, we change its color
     if [[ $index -eq $((${#options[@]}-1)) ]]; then
         echo -e "${ORANGE}${padded_index}. ${options[$index]}${RESET}"
-        break 2
+        break 
     fi
     echo -e "${CYAN}${padded_index}. ${options[$index]}${RESET}"
     done
