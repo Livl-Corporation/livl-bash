@@ -39,4 +39,4 @@ You can also directly launch one of the utility scripts :
 
 ## Report
 
-You can read our [report here](report.md).
+You can read our [report here](REPORT.md).
