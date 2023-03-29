@@ -12,5 +12,6 @@ fi
 
 groupadd -f livl-bash
 usermod -a -G livl-bash $1
-chmod +x *.sh # TODO : Group missing
+
 chgrp livl-bash *.sh
+chmod g+x *.sh
