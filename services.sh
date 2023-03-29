@@ -57,7 +57,6 @@ function show_menu() {
 
 while true; do
     clear 
-
     show_menu
     read -p "Entrez votre choix (1-${#options[@]}): " choice
 
