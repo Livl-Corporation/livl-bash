@@ -66,7 +66,73 @@ function write_processes_to_file() {
   echo "Fin de lecture du fichier '$file'."
 }
 
-options=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Quitter")
+function filter_process_help() {
+  echo "Options:"
+  echo "  -a, --actifs          Afficher uniquement les processus actifs"
+  echo "  -m, --memoire <N>     Afficher les processus avec une utilisation mémoire supérieure à N"
+  echo "  -n, --nom <NAME>       Afficher les processus avec le nom NAME"
+}
+
+
+# Fonction pour afficher la liste des processus avec des filtres
+function filter_process() {
+    # Options par défaut
+    ACTIVE=false
+    MAX_MEMORY=0
+    NAME=""
+
+    # Analyse des options
+    while [[ $# -gt 0 ]]
+    do
+        key="$1"
+        case $key in
+            -a|--actifs)
+            ACTIVE=true
+            shift
+            ;;
+            -m|--memoire)
+            MAX_MEMORY=$2
+            shift
+            shift
+            ;;
+            -n|--nom)
+            NAME="$2"
+            shift
+            shift
+            ;;
+            *)
+            echo "Option invalide : $1"
+            return 1
+            ;;
+        esac
+    done
+
+    # Construction de la commande ps avec les filtres
+    CMD="ps -eo pid,user,%mem,command"
+
+    if [ "$ACTIVE" = true ]; then
+        CMD="$CMD | grep -v defunct | grep -v '<defunct>'"
+    fi
+
+    if [ "$MAX_MEMORY" -gt 0 ]; then
+        CMD="$CMD | awk '\$3 > $MAX_MEMORY'"
+    fi
+    
+    if [ -n "$NAME" ]; then
+        CMD="$CMD | grep $NAME"
+    fi
+    echo "Commande : $CMD"
+    eval $CMD
+}
+
+function filter_process_ask_args() {
+  filter_process_help
+  read -p "Entrez les arguments pour exécuter la fonction lister_processus : " args
+  filter_process $args
+}
+
+
+options=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Filtrer l'affichage des processus" "Quitter")
 
 function show_menu() {
     clear
@@ -95,7 +161,8 @@ while true; do
     4) run_menu_option "$choice" "${options[$choice-1]}" "list_memory_processes" ;;
     5) run_menu_option "$choice" "${options[$choice-1]}" "list_matching_processes" ;;
     6) run_menu_option "$choice" "${options[$choice-1]}" "write_processes_to_file";;
-    7) exit 0 ;;
+    7) run_menu_option "$choice" "${options[$choice-1]}" "filter_process_ask_args";;
+    8) exit 0 ;;
     *) error_message "Choix invalide" ;;
   esac
 done

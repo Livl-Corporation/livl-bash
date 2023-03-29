@@ -68,14 +68,15 @@ function display_list_of_option()
     
     echo ""
     for index in "${!options[@]}"; do
-    printf -v padded_index "%02d" $(($index+1))
-    # if we come to the last element of array, we change its color
-    if [[ $index -eq $((${#options[@]}-1)) ]]; then
-        echo -e "${ORANGE}${padded_index}. ${options[$index]}${RESET}"
-        break 2
-    fi
-    echo -e "${CYAN}${padded_index}. ${options[$index]}${RESET}"
+        printf -v padded_index "%02d" $(($index+1))
+        # if we come to the last element of array, we change its color
+        if [[ $index -eq $((${#options[@]}-1)) ]]; then
+            echo -e "${ORANGE}${padded_index}. ${options[$index]}${RESET}"
+            break
+        fi
+        echo -e "${CYAN}${padded_index}. ${options[$index]}${RESET}"
     done
 
     echo ""
+
 }
