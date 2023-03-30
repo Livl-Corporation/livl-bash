@@ -56,4 +56,7 @@ Il n'y a pas de possibilité de choisir pour chaque filtre si il doit s'agir d'u
 
 ### Partie 5 : Délégation
 
-@franckg28
+Il a fallu imaginer une manière de donner uniquement des droits d'execution à certains utilisateurs.
+Nous avons pour cela utilisé les groupes.
+Le script `delegate.sh` permet de créer un groupe `livl-bash` et d'y ajouter un utilisateur.
+Une fois ce groupe créé et l'utilisateur ajouté, il est possible de donner les droits d'execution au script `main.sh` à ce groupe.
