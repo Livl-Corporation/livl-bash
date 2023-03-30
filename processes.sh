@@ -4,7 +4,7 @@
 source common.sh
 
 # Définition des options du menu
-MENU_OPTIONS=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Tuer un processus par son ID" "Quitter")
+MENU_OPTIONS=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Tuer un processus par son ID" "Filtre de recherche (actif/mémoire/nom)" "Quitter")
 # Définition des noms de fonctions associées aux options du menu
 MENU_ACTIONS=("list_all_processes" "list_active_processes" "list_user_processes" "list_memory_processes" "list_matching_processes" "write_processes_to_file" "kill_process_by_id" "filter_process_ask_args")
 
@@ -119,21 +119,21 @@ function filter_process() {
             -a|--actifs)
             ACTIVE=true
             shift
-            ;;
+          ;;
             -m|--memoire)
             MAX_MEMORY=$2
             shift
             shift
-            ;;
+          ;;
             -n|--nom)
             NAME="$2"
             shift
             shift
-            ;;
-            *)
+          ;;
+          *)
             echo "Option invalide : $1"
-            return 1
-            ;;
+            return
+          ;;
         esac
     done
 
