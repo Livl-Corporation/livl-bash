@@ -3,6 +3,10 @@
 # Source the common.sh script
 source common.sh
 
+# Définition des options du menu
+MENU_OPTIONS=("Liste des services disponibles/installés" "Liste des services actifs" "Vérifier le statut d'un service" "Redémarrer un service" "Quitter")
+MENU_ACTIONS=("list_services" "list_active_services" "check_service_status" "restart_service")
+
 # a) Identifier les services disponibles/installés sur le système
 function list_services() {
     systemctl list-unit-files --type=service --no-pager
@@ -15,30 +19,15 @@ function list_active_services() {
 
 # c) Identifier le statut d’un service dont le nom contient une chaine de caractères (définie en paramètre)
 function check_service_status() {
-    read -p "$(echo -e ${CYAN}Entrez le nom du service à vérifier :${RESET}) " service_name
-
-    if [ -z $service_name ]; then # -z = empty
-        error_message "Nom de service invalide"
-        check_service_status 
-    fi
-
+    service_name=$("ask_for_string" "Entrez le nom du service à vérifier :")
     systemctl status $service_name
 }
 
 # d) Proposer une fonctionnalité supplémentaire : redémarrer un service dont le nom contient une chaîne de caractères (définie en paramètre)
 function restart_service() {
-    read -p "$(echo -e ${CYAN}Entrez le nom du service à redémarrer :${RESET}) " service_name
-
-    if [ -z $service_name ]; then # -z = empty
-        error_message "Nom de service invalide"
-        restart_service
-    fi
-    
+    service_name=$("ask_for_string" "Entrez le nom du service à redémarrer :")
     systemctl restart $service_name
 }
-
-# Définition des options du menu
-options=( "Liste des services disponibles/installés" "Liste des services actifs" "Vérifier le statut d'un service" "Redémarrer un service" "Quitter" )
 
 function show_menu() {
     clear
@@ -50,8 +39,7 @@ function show_menu() {
     echo -e "${RED}/____/_____/_/ |_| |___/___/\____/_____/  ${YELLOW}/_____//_/|_/_/   /_____/\____/_/ |_/_____/_/ |_|   "
     echo -e "                                                                                             ${RESET}"
     
-
-    display_list_of_option "${options[@]}"
+    display_list_of_option "${MENU_OPTIONS[@]}"
 }
 
 
@@ -60,12 +48,11 @@ while true; do
     show_menu
     read -p "Entrez votre choix (1-${#options[@]}): " choice
 
-    case $choice in
-        1) run_menu_option "$choice" "${options[$choice-1]}" "list_services" ;;
-        2) run_menu_option "$choice" "${options[$choice-1]}" "list_active_services" ;;
-        3) run_menu_option "$choice" "${options[$choice-1]}" "check_service_status" ;;
-        4) run_menu_option "$choice" "${options[$choice-1]}" "restart_service";;
-        5) exit 0 ;;
-        *) error_message "Choix invalide" ;;
-    esac     
+    if ((choice >= 1 && choice <= ${#MENU_ACTIONS[@]})); then
+        run_menu_option "$choice" "${MENU_OPTIONS[$choice-1]}" "${MENU_ACTIONS[$choice-1]}"
+    elif ((choice == ${#MENU_OPTIONS[@]})); then
+        exit 0
+    else
+        error_message "Choix invalide"
+    fi   
 done
