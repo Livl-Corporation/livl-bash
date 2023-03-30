@@ -42,7 +42,7 @@ sudo ./delegate.sh
     <tr align="center">
         <td><b>Franck Gutmann</b></td>
         <td><b>Julien Von Der Marck</b></td>
-  </tr>
+    </tr>
 </table>
 
 ## Report
