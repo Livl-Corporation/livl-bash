@@ -10,13 +10,11 @@ MENU_ACTIONS=("list_all_processes" "list_active_processes" "list_user_processes"
 
 # a) Identifier tous les processus présents sur le système et indiquer leur propriétaire
 function list_all_processes() {
-  echo "Liste de tous les processus:"
   ps -ef
 }
 
 # b) Fonction pour afficher la liste des processus actifs
 function list_active_processes() {
-  echo "Liste des processus actifs:"
   ps -ef | grep -v defunct | grep -v "<defunct>"
 }
 
@@ -33,8 +31,7 @@ function list_user_processes() {
 
 # d) Identifier les processus consommant le plus de mémoire et indiquer leur propriétaire
 function list_memory_processes() {
-  echo "Liste des processus consommant le plus de mémoire:"
-  ps -eo pid,user,%mem,command --sort=-%mem | head
+  ps aux --sort=-%mem | awk '{print $2,$1,$4,$11}' | head -n 11 | column -t 
 }
 
 # e) Identifier les processus dont le nom contient une chaine de caractères (définie en paramètre) et indiquer leur propriétaire
@@ -160,7 +157,7 @@ function filter_process() {
 
 function filter_process_ask_args() {
   filter_process_help
-  read -p "Entrez les arguments pour exécuter la fonction lister_processus : " args
+  args=$(ask_for_string "Entrez les arguments pour exécuter la fonction lister_processus : ")
   filter_process $args
 }
 
