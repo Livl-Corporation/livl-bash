@@ -3,6 +3,11 @@
 # Source the common.sh script
 source common.sh
 
+# Définition des options du menu
+MENU_OPTIONS=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Tuer un processus par son ID" "Quitter")
+# Définition des noms de fonctions associées aux options du menu
+MENU_ACTIONS=("list_all_processes" "list_active_processes" "list_user_processes" "list_memory_processes" "list_matching_processes" "write_processes_to_file" "kill_process_by_id" "filter_process_ask_args")
+
 # a) Identifier tous les processus présents sur le système et indiquer leur propriétaire
 function list_all_processes() {
   echo "Liste de tous les processus:"
@@ -17,13 +22,12 @@ function list_active_processes() {
 
 # c) Identifier les processus appartenant à un utilisateur donné en paramètre
 function list_user_processes() {
-  read -p "Entrez le nom d'utilisateur: " user
-
-  if [ -z "$user" ]; then
-    error_message "Nom d'utilisateur invalide"
+  user=$(ask_for_string "Entrez le nom d'utilisateur: ")
+  # check if user exist in /etc/passwd
+  if ! id -u "$user" >/dev/null 2>&1 ; then
+    error_message "L'utilisateur $user n'existe pas"
     list_user_processes
   fi
-
   ps -u "$user"
 }
 
@@ -35,46 +39,68 @@ function list_memory_processes() {
 
 # e) Identifier les processus dont le nom contient une chaine de caractères (définie en paramètre) et indiquer leur propriétaire
 function list_matching_processes() {
-  read -p "Entrez une chaîne de caractères pour lister les processus : " pattern
-  
-  if [ -z "$pattern" ]; then
-    error_message "Chaîne de caractères invalide"
-    list_matching_processes
+  pattern=$(ask_for_string "Entrez une chaîne de caractères pour lister les processus : ")
+
+  # Rechercher les processus dont le nom contient la chaîne de caractères
+  processes=$(ps aux | grep "$pattern" | grep -v grep)
+
+  if [ -z "$processes" ]; then # Si aucun processus n'a été trouvé
+    echo "Aucun processus ne correspond à la chaîne de caractères \"$pattern\"."
+    return
   fi
 
-  echo "Liste des processus dont le nom contient '$pattern':"
-  ps -eo pid,user,%mem,command | grep "$pattern"
+  echo "Les processus suivants ont été trouvés :"
+  echo "$processes" | while read user pid cpu mem vsz rss tty stat start time command
+  do
+    echo "PID: $pid - Propriétaire: $user"
+  done
 }
 
 # f) Produire un fichier de sortie contenant le résultat de la recherche effectuée qui n’écrase pas les résultats de la recherche précédente (tenir compte par exemple de la date et l’heure système)
 function write_processes_to_file() {
-  read -p "Entrez une chaîne de caractères pour lister les processus : " pattern
+  pattern=$(ask_for_string "Entrez une chaîne de caractères pour lister les processus : ")
+  output_file="processes_$pattern_$(date +%Y%m%d_%H%M%S).txt"
 
-  if [ -z "$pattern" ]; then
-    error_message "Chaîne de caractères invalide"
-    write_processes_to_file
+  # Rechercher les processus dont le nom contient la chaîne de caractères
+  processes=$(ps aux | grep "$pattern" | grep -v grep)
+
+  if [ -z "$processes" ]; then # Si aucun processus n'a été trouvé
+    echo "Aucun processus ne correspond à la chaîne de caractères \"$pattern\"."
+    return
   fi
 
-  file="processes_$(date +'%Y-%m-%d_%H-%M-%S').txt"
-  echo "Écriture de la liste des processus correspondant à '$pattern' dans le fichier '$file'..."
-  ps -eo pid,user,%mem,command | grep "$pattern" > "$file"
+  echo "Les processus suivants ont été trouvés :"
+  echo "$processes" | while read user pid cpu mem vsz rss tty stat start time command
+  do
+    echo "PID: $pid - Propriétaire: $user"
+  done > "$output_file"
 
-  echo "Lecture du fichier '$file':"
-  echo "---------------------------------"
-  cat "$file"
-  echo "---------------------------------"
-  echo "Fin de lecture du fichier '$file'."
+  echo "Résultats de la recherche enregistrés dans le fichier \"$output_file\"."
 }
 
 # g) Proposer une fonctionnalité supplémentaire que vous jugez intéressante et qui manque à la liste précédente (argumentez votre choix)
-# afficher les processus en fonction de leur utilisation de la CPU, car cela peut aider à identifier les processus qui consomment le plus de ressources et à les arrêter si nécessaire
-function list_max_to_min_process_memory() {
-  ps -eo pid,user,%cpu,args --sort=-%cpu | head
+# Tuer un processus par son ID
+function kill_process_by_id() {
+  pid=$(ask_for_number "Entrez l'ID du processus à tuer : ")
+
+  if ! ps -p "$pid" > /dev/null; then
+    echo "Le processus avec l'ID $pid n'existe pas."
+    return
+  fi
+
+  # Demander confirmation avant de tuer le processus
+  read -p "Êtes-vous sûr de vouloir tuer le processus avec l'ID $pid ? (y/n) " confirm
+  if [[ $confirm =~ ^[Yy]$ ]]; then
+    kill $pid
+    echo "Le processus avec l'ID $pid a été tué."
+  else
+    echo "Le processus avec l'ID $pid n'a pas été tué."
+  fi
 }
 
 
 function filter_process_help() {
-  echo "Options:"
+  echo "MENU_OPTIONS:"
   echo "  -a, --actifs          Afficher uniquement les processus actifs"
   echo "  -m, --memoire <N>     Afficher les processus avec une utilisation mémoire supérieure à N"
   echo "  -n, --nom <NAME>       Afficher les processus avec le nom NAME"
@@ -83,12 +109,12 @@ function filter_process_help() {
 
 # Fonction pour afficher la liste des processus avec des filtres
 function filter_process() {
-    # Options par défaut
+    # MENU_OPTIONS par défaut
     ACTIVE=false
     MAX_MEMORY=0
     NAME=""
 
-    # Analyse des options
+    # Analyse des MENU_OPTIONS
     while [[ $# -gt 0 ]]
     do
         key="$1"
@@ -138,9 +164,6 @@ function filter_process_ask_args() {
   filter_process $args
 }
 
-
-options=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Proposer une fonctionnalité supplémentaire que vous jugez intéressante et qui manque à la liste précédente" "Filtrer l'affichage des processus" "Quitter")
-
 function show_menu() {
     clear
     
@@ -151,7 +174,7 @@ function show_menu() {
     echo -e "${RED}/_/   /_/ |_|\____/\____/_____//____/____/  ${YELLOW}/_____//_/|_/_/   /_____/\____/_/ |_/_____/_/ |_|   ${RESET}"
                                                                                                
 
-    display_list_of_option "${options[@]}"
+    display_list_of_option "${MENU_OPTIONS[@]}"
 }
 
 # Fonction pour afficher le menu principal
@@ -159,18 +182,13 @@ function show_menu() {
 while true; do
   show_menu
 
-  read -p "Entrez votre choix (1-${#options[@]}): " choice
+  read -p "Entrez votre choix (1-${#MENU_OPTIONS[@]}): " choice
 
-  case $choice in
-    1) run_menu_option "$choice" "${options[$choice-1]}" "list_all_processes" ;;
-    2) run_menu_option "$choice" "${options[$choice-1]}" "list_active_processes" ;;
-    3) run_menu_option "$choice" "${options[$choice-1]}" "list_user_processes" ;;
-    4) run_menu_option "$choice" "${options[$choice-1]}" "list_memory_processes" ;;
-    5) run_menu_option "$choice" "${options[$choice-1]}" "list_matching_processes" ;;
-    6) run_menu_option "$choice" "${options[$choice-1]}" "write_processes_to_file";;
-    7) run_menu_option "$choice" "${options[$choice-1]}" "list_processes_by_memory";;
-    8) run_menu_option "$choice" "${options[$choice-1]}" "list_max_to_min_process_memory";;
-    9) exit 0 ;;
-    *) error_message "Choix invalide" ;;
-  esac
+  if ((choice >= 1 && choice <= ${#MENU_ACTIONS[@]})); then
+    run_menu_option "$choice" "${MENU_OPTIONS[$choice-1]}" "${MENU_ACTIONS[$choice-1]}"
+  elif ((choice == ${#MENU_OPTIONS[@]})); then
+    exit 0
+  else
+    error_message "Choix invalide"
+  fi
 done
