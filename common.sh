@@ -65,7 +65,7 @@ function ask_for_string()
     local string
     local textToDisplay="$1"
     while true; do
-        read -p "$textToDisplay" string
+        read -p "$(echo -e ${CYAN}"$textToDisplay"${RESET}) " string
         if [ -z "$string" ]; then
             error_message "La chaîne de caractères ne peut pas être vide."
             continue
@@ -81,7 +81,7 @@ function ask_for_number()
     local number
     local textToDisplay="$1"
     while true; do
-        read -p "$textToDisplay" number
+        read -p "$(echo -e ${CYAN}"$textToDisplay"${RESET})" number 
         if [[ $number =~ ^[0-9]+$ ]]; then
             return $number
         else

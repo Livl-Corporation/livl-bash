@@ -3,19 +3,19 @@
 # Source the common.sh script
 source common.sh
 
-# Fonction pour afficher la liste de tous les processus
+# a) Identifier tous les processus présents sur le système et indiquer leur propriétaire
 function list_all_processes() {
   echo "Liste de tous les processus:"
   ps -ef
 }
 
-# Fonction pour afficher la liste des processus actifs
+# b) Fonction pour afficher la liste des processus actifs
 function list_active_processes() {
   echo "Liste des processus actifs:"
   ps -ef | grep -v defunct | grep -v "<defunct>"
 }
 
-# Fonction pour afficher la liste des processus d'un utilisateur donné
+# c) Identifier les processus appartenant à un utilisateur donné en paramètre
 function list_user_processes() {
   read -p "Entrez le nom d'utilisateur: " user
 
@@ -27,13 +27,13 @@ function list_user_processes() {
   ps -u "$user"
 }
 
-# Fonction pour afficher la liste des processus consommant le plus de mémoire
+# d) Identifier les processus consommant le plus de mémoire et indiquer leur propriétaire
 function list_memory_processes() {
   echo "Liste des processus consommant le plus de mémoire:"
   ps -eo pid,user,%mem,command --sort=-%mem | head
 }
 
-# Fonction pour afficher la liste des processus dont le nom contient une chaîne de caractères
+# e) Identifier les processus dont le nom contient une chaine de caractères (définie en paramètre) et indiquer leur propriétaire
 function list_matching_processes() {
   read -p "Entrez une chaîne de caractères pour lister les processus : " pattern
   
@@ -46,7 +46,7 @@ function list_matching_processes() {
   ps -eo pid,user,%mem,command | grep "$pattern"
 }
 
-# Fonction pour écrire la liste des processus correspondant à un critère de recherche dans un fichier
+# f) Produire un fichier de sortie contenant le résultat de la recherche effectuée qui n’écrase pas les résultats de la recherche précédente (tenir compte par exemple de la date et l’heure système)
 function write_processes_to_file() {
   read -p "Entrez une chaîne de caractères pour lister les processus : " pattern
 
@@ -65,6 +65,13 @@ function write_processes_to_file() {
   echo "---------------------------------"
   echo "Fin de lecture du fichier '$file'."
 }
+
+# g) Proposer une fonctionnalité supplémentaire que vous jugez intéressante et qui manque à la liste précédente (argumentez votre choix)
+# afficher les processus en fonction de leur utilisation de la CPU, car cela peut aider à identifier les processus qui consomment le plus de ressources et à les arrêter si nécessaire
+function list_max_to_min_process_memory() {
+  ps -eo pid,user,%cpu,args --sort=-%cpu | head
+}
+
 
 function filter_process_help() {
   echo "Options:"
@@ -132,7 +139,7 @@ function filter_process_ask_args() {
 }
 
 
-options=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Filtrer l'affichage des processus" "Quitter")
+options=("Liste de tous les processus" "Liste des processus actifs" "Liste des processus d'un utilisateur donné" "Liste des processus consommant le plus de mémoire" "Liste des processus dont le nom contient une chaîne de caractères" "Écrire la liste des processus correspondant à un critère de recherche dans un fichier" "Proposer une fonctionnalité supplémentaire que vous jugez intéressante et qui manque à la liste précédente" "Filtrer l'affichage des processus" "Quitter")
 
 function show_menu() {
     clear
@@ -161,8 +168,9 @@ while true; do
     4) run_menu_option "$choice" "${options[$choice-1]}" "list_memory_processes" ;;
     5) run_menu_option "$choice" "${options[$choice-1]}" "list_matching_processes" ;;
     6) run_menu_option "$choice" "${options[$choice-1]}" "write_processes_to_file";;
-    7) run_menu_option "$choice" "${options[$choice-1]}" "filter_process_ask_args";;
-    8) exit 0 ;;
+    7) run_menu_option "$choice" "${options[$choice-1]}" "list_processes_by_memory";;
+    9) run_menu_option "$choice" "${options[$choice-1]}" "list_max_to_min_process_memory";;
+    10) exit 0 ;;
     *) error_message "Choix invalide" ;;
   esac
 done

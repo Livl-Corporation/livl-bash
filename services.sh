@@ -25,7 +25,7 @@ function check_service_status() {
     systemctl status $service_name
 }
 
-# Proposer une fonctionnalité supplémentaire : redémarrer un service dont le nom contient une chaîne de caractères (définie en paramètre)
+# d) Proposer une fonctionnalité supplémentaire : redémarrer un service dont le nom contient une chaîne de caractères (définie en paramètre)
 function restart_service() {
     read -p "$(echo -e ${CYAN}Entrez le nom du service à redémarrer :${RESET}) " service_name
 

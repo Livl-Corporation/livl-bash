@@ -32,8 +32,7 @@ function show_subdir_sizes() {
 }
 # g) Changer de répertoire courant pour poursuivre mes investigations
 function change_dir() {
-    ask_for_string "Entrez le chemin du répertoire dans lequel vous voulez aller:"
-    newdir=$?
+    newdir=$(ask_for_string "Entrez le chemin du répertoire dans lequel vous voulez aller: ") 
     cd "$newdir"
 }
 # h) Rechercher les fichiers plus récents qu’une date pour le répertoire courant 
@@ -87,7 +86,6 @@ function search_size_lt_all() {
 # p) Rechercher tous les fichiers d’une extension donnée présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_ext_all() {
     ext=$(ask_for_string "Entrez l'extension des fichiers recherchés: ") 
-    echo "Fichiers avec l'extension .$ext :"
     find . -type f -name "*.$ext"
 }
 # q) Rechercher tous les fichiers d’une extension donnée présents dans le répertoire courant 
@@ -102,7 +100,7 @@ function search_name_all() {
     find . -type f -name "*$string*"
 }
 
-# s) Produire un fichier de sortie contenant le résultat de la recherche effectuée qui n’écrase pas les résultats de la recherche précédente
+# s) Produire un fichier de sortie contenant le résultat de la recherche effectuée qui n’écrase pas les résultats de la recherche précédente (tenir compte par exemple de la date et l’heure système)
 function search_name_all_outfile() {
     string=$(ask_for_string "Entrez la chaine de caractères recherchée: ")
     find . -type f -name "*$string*" > search_results.txt
