@@ -1,6 +1,14 @@
 #!/bin/bash
 
+# Importation des fonctions communes
 source common.sh
+
+# Définition des options du menu
+MENU_OPTIONS=( "Afficher le répertoire courant " "Afficher la date et l'heure du système " "Afficher le nombre de fichiers et leur taille dans le répertoire courant " "Afficher le nombre de sous-répertoires dans le répertoire courant " "Afficher l'arborescence du répertoire courant avec une profondeur paramétrable " "Afficher le poids de chaque sous-répertoire dans le répertoire courant " "Changer le répertoire courant " "Rechercher les fichiers plus récents qu'une date donnée dans le répertoire courant " "Rechercher les fichiers plus récents qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers plus anciens qu'une date donnée dans le répertoire courant " "Rechercher les fichiers plus anciens qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers de poids supérieur à une valeur donnée dans le répertoire courant " "Rechercher les fichiers de poids supérieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers de poids inférieur à une valeur donnée dans le répertoire courant " "Rechercher les fichiers de poids inférieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher tous les fichiers d'une extension donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher tous les fichiers d'une extension donnée dans le répertoire courant " "Rechercher tous les fichiers dont le nom contient une chaîne de caractères dans tous les sous-répertoires de l'arborescence du répertoire courant " "Produire un fichier de sortie contenant le résultat de la recherche effectuée sans écraser les résultats précédents " "Rechercher des fichiers en fonction de leur contenu " "Filtre de recherche : date, taille, nom " "Quitter." )
+
+# Définition des fonctions associées aux options du menu
+MENU_ACTIONS=("show_pwd" "show_date" "show_files" "show_subdirs" "show_tree" "show_subdir_sizes" "change_dir" "search_newer" "search_newer_all" "search_older" "search_older_all" "search_size_gt" "search_size_gt_all" "search_size_lt" "search_size_lt_all" "search_ext_all" "search_ext_main" "search_name_all" "search_name_all_outfile" "search_content" "show_filter_menu")
+
 
 # a) Afficher le répertoire courant
 function show_pwd() {
@@ -20,8 +28,7 @@ function show_subdirs() {
 }
 # e) Indiquer l’arborescence du répertoire courant avec une profondeur paramétrable
 function show_tree() {
-    ask_for_number "Entrez la profondeur souhaitée pour l'arborescence: "
-    depth=$?
+    depth=$(ask_for_number "Entrez la profondeur souhaitée pour l'arborescence: ")
     find . -maxdepth $depth -type d -print | sed -e "s;[^/]*/;|____;g;s;____|; |;g" 
 }
 # f) Indiquer le poids de chaque sous-répertoire du répertoire courant
@@ -33,54 +40,50 @@ function show_subdir_sizes() {
 # g) Changer de répertoire courant pour poursuivre mes investigations
 function change_dir() {
     newdir=$(ask_for_string "Entrez le chemin du répertoire dans lequel vous voulez aller: ") 
+    if [ ! -d "$newdir" ]; then
+        echo "Le répertoire $newdir n'existe pas."
+        return
+    fi
     cd "$newdir"
 }
 # h) Rechercher les fichiers plus récents qu’une date pour le répertoire courant 
 function search_newer() {
-    ask_for_date
-    date=$?
-    find . -maxdepth 1 -type f ! -newermt $date
+    date=$(ask_for_date)
+    find . -maxdepth 1 -type f ! -newermt "$date"
 }
 # i) Rechercher les fichiers plus récents qu’une date présents dans tous les sous-répertoires de l’arborescence du répertoire courant 
 function search_newer_all() {
-    ask_for_date
-    date=$?
-    find . ! -newermt $date
+    date=$(ask_for_date)
+    find . ! -newermt $date -type f
 }
 # j) Rechercher les fichiers plus anciens qu’une date pour le répertoire courant
 function search_older() {
-    ask_for_date 
-    date=$?
-    find . -maxdepth 1 -type f -newermt $date
+    date=$(ask_for_date)
+    find . -maxdepth 1 -type f -newermt $date 
 }
 # k) Rechercher les fichiers plus anciens qu’une date présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_older_all() {
-    ask_for_date 
-    date=$?
+    date=$(ask_for_date)
     find . -type f -newermt $date
 }
 # l) Rechercher les fichiers de poids supérieur à une valeur indiquée présents dans le répertoire courant
 function search_size_gt() {
-    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
-    size=$?
+    size=$(ask_for_number "Entrez la taille minimale des fichiers (en Ko): ")
     find . -maxdepth 1 -type f -size +${size}k
 }
 # m) Rechercher les fichiers de poids supérieur à une valeur présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_size_gt_all() {
-    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
-    size=$?
+    size=$(ask_for_number "Entrez la taille minimale des fichiers (en Ko):")
     find . -type f -size +${size}k
 }
 # n) Rechercher les fichiers de poids inférieur à une valeur indiquée présents dans le répertoire courant
 function search_size_lt() {
-    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
-    size=$?
+    size=$(ask_for_number "Entrez la taille minimale des fichiers (en Ko): ")
     find . -maxdepth 1 -type f -size -${size}k
 }
 # o) Rechercher les fichiers de poids inférieur à une valeur indiquée présents dans tous les sous-répertoires de l’arborescence du répertoire courant
 function search_size_lt_all() {
-    ask_for_number "Entrez la taille minimale des fichiers (en Ko): "
-    size=$?
+    size=$(ask_for_number "Entrez la taille minimale des fichiers (en Ko): ")
     find . -type f -size -${size}k
 }
 # p) Rechercher tous les fichiers d’une extension donnée présents dans tous les sous-répertoires de l’arborescence du répertoire courant
@@ -112,8 +115,6 @@ function search_content() {
     grep -r "$text" .
 }
 
-# Définition des options du menu
-options=( "Afficher le répertoire courant " "Afficher la date et l'heure du système " "Afficher le nombre de fichiers et leur taille dans le répertoire courant " "Afficher le nombre de sous-répertoires dans le répertoire courant " "Afficher l'arborescence du répertoire courant avec une profondeur paramétrable " "Afficher le poids de chaque sous-répertoire dans le répertoire courant " "Changer le répertoire courant " "Rechercher les fichiers plus récents qu'une date donnée dans le répertoire courant " "Rechercher les fichiers plus récents qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers plus anciens qu'une date donnée dans le répertoire courant " "Rechercher les fichiers plus anciens qu'une date donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers de poids supérieur à une valeur donnée dans le répertoire courant " "Rechercher les fichiers de poids supérieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher les fichiers de poids inférieur à une valeur donnée dans le répertoire courant " "Rechercher les fichiers de poids inférieur à une valeur donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher tous les fichiers d'une extension donnée dans tous les sous-répertoires de l'arborescence du répertoire courant " "Rechercher tous les fichiers d'une extension donnée dans le répertoire courant " "Rechercher tous les fichiers dont le nom contient une chaîne de caractères dans tous les sous-répertoires de l'arborescence du répertoire courant " "Produire un fichier de sortie contenant le résultat de la recherche effectuée sans écraser les résultats précédents " "Rechercher des fichiers en fonction de leur contenu " "Filtre de recherche : date, taille, nom " "Quitter." )
 
 # Fonction pour afficher le menu
 function show_menu() {
@@ -123,7 +124,7 @@ function show_menu() {
     echo -e "${RED} / __/ _/ // /___/ /___   ${YELLOW}/ /___ /   |/ ____/ /___/ /_/ / _, _/ /___/ _, _/  "
     echo -e "${RED}/_/   /___/_____/_____/  ${YELLOW}/_____//_/|_/_/   /_____/\____/_/ |_/_____/_/ |_|   ${RESET}"
 
-    display_list_of_option "${options[@]}"
+    display_list_of_option "${MENU_OPTIONS[@]}"
 }
 
 function search_files() {
@@ -190,18 +191,15 @@ function show_filter_menu() {
             filters+=" $mode -name '$file_name'"
             ;;
         'i')
-            ask_for_number "Taille minimale (en Ko): " min_size
-            min_size=$?
-            ask_for_number "Taille maximale (en Ko): " max_size
-            max_size=$?
+            min_size=$(ask_for_number "Taille minimale (en Ko): ")
+            max_size=$(ask_for_number "Taille maximale (en Ko): ")
             filters+=" $mode -size +${min_size}k -size -${max_size}k"
             ;;
         'd')
-            ask_for_date "Date minimale (format: YYYY-MM-DD): " min_date
-            ask_for_date "Date maximale (format: YYYY-MM-DD): " max_date
-            check_correct_date "$min_date" "$max_date"
-            if [[ $? -eq 1 ]]; then
-                error_message "La date minimale doit être antérieure à la date maximale."
+            min_date=$(ask_for_date "Date minimale (format: YYYY-MM-DD): ")
+            max_date=$(ask_for_date "Date maximale (format: YYYY-MM-DD): ")
+            if [[ $min_date > $max_date ]]; then
+                error_message "La date de début doit être antérieure à la date de fin."
                 continue
             fi
             filters+=" $mode -newermt '$min_date' ! -newermt '$max_date'"
@@ -224,58 +222,18 @@ function show_filter_menu() {
     done
 }
 
-
 # Menu interactif
 while true; do
     clear
 
     show_menu
-    read -p "Entrez votre choix (1-${#options[@]}): " choix
+    read -p "Entrez votre choix (1-${#MENU_OPTIONS[@]}): " choice
 
-    case $choix in
-        1) 
-            run_menu_option "$choice" "${options[$choix-1]}" "show_pwd";;
-        2)  
-            run_menu_option "$choice" "${options[$choix-1]}" "show_date";;
-        3) 
-            run_menu_option "$choice" "${options[$choix-1]}" "show_files";;
-        4)  
-            run_menu_option "$choice" "${options[$choix-1]}" "show_subdirs";;
-        5)  
-            run_menu_option "$choice" "${options[$choix-1]}" "show_tree";;
-        6)  
-            run_menu_option "$choice" "${options[$choix-1]}" "show_subdir_sizes";;
-        7)  
-            run_menu_option "$choice" "${options[$choix-1]}" "change_dir";;
-        8)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_newer";;
-        9)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_newer_all";;
-        10)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_older";;
-        11)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_older_all";;
-        12) 
-            run_menu_option "$choice" "${options[$choix-1]}" "search_size_gt";;
-        13)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_size_gt_all";;
-        14)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_size_lt";;
-        15)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_size_lt_all";;
-        16)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_ext_all";;
-        17)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_ext_main";;
-        18)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_name_all";;
-        19) 
-            run_menu_option "$choice" "${options[$choix-1]}" "search_name_all_outfile";;
-        20)  
-            run_menu_option "$choice" "${options[$choix-1]}" "search_content";;
-        21)  
-            run_menu_option "$choice" "${options[$choix-1]}" "show_filter_menu";;
-        22) exit 0 ;;
-        *) error_message "Choix invalide" ;;
-    esac
+    if ((choice >= 1 && choice <= ${#MENU_ACTIONS[@]})); then
+        run_menu_option "$choice" "${MENU_OPTIONS[$choice-1]}" "${MENU_ACTIONS[$choice-1]}"
+    elif ((choice == ${#MENU_OPTIONS[@]})); then
+        exit 0
+    else
+        error_message "Choix invalide"
+    fi
 done
