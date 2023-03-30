@@ -57,9 +57,10 @@ function run_menu_option() {
 # Function that displays an error message
 function error_message() {
     local message="$1"
-    echo -e "${RED}${BOLD}Erreur: ${message}${RESET}"
+    echo -e "${RED}${BOLD}Erreur: ${message}${RESET}" >&2 # redirect to stderr
 }
 
+# Function that ask for a correct string value
 function ask_for_string()
 {
     local string
@@ -76,6 +77,7 @@ function ask_for_string()
     done
 }
 
+# Function that ask for a correct number value
 function ask_for_number()
 {
     local number
@@ -83,18 +85,20 @@ function ask_for_number()
     while true; do
         read -p "$(echo -e ${CYAN}"$textToDisplay"${RESET})" number 
         if [[ $number =~ ^[0-9]+$ ]]; then
-            return $number
+            echo "$number"
+            break
         else
             error_message "Le nombre doit être un entier positif."
         fi
     done
 }
 
+# Function that ask for a correct date value
 function ask_for_date() {
     local date
     local textToDisplay="$1"
 
-    if [ -z "$textToDisplay" ]; then
+    if [ -z $textToDisplay ]; then
         textToDisplay="Entrez la date (au format YYYY-MM-DD): "
     fi
 
@@ -102,11 +106,13 @@ function ask_for_date() {
         read -p "$textToDisplay" date
         check_correct_date "$date"
         if [ $? = 0 ]; then
-            return $date
+            echo "$date"
+            break
         fi
     done
 }
 
+# Function that checks if a date is correct regarding the format
 function check_correct_date()
 {
     local date="$1"
@@ -131,7 +137,7 @@ function check_correct_date()
     return 1
 }
 
-# Function that displays a list of options menu for the user to choose from
+# Function that displays a list of options menu 
 function display_list_of_option()
 {
     local options=("$@") 
