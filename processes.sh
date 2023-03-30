@@ -169,8 +169,8 @@ while true; do
     5) run_menu_option "$choice" "${options[$choice-1]}" "list_matching_processes" ;;
     6) run_menu_option "$choice" "${options[$choice-1]}" "write_processes_to_file";;
     7) run_menu_option "$choice" "${options[$choice-1]}" "list_processes_by_memory";;
-    9) run_menu_option "$choice" "${options[$choice-1]}" "list_max_to_min_process_memory";;
-    10) exit 0 ;;
+    8) run_menu_option "$choice" "${options[$choice-1]}" "list_max_to_min_process_memory";;
+    9) exit 0 ;;
     *) error_message "Choix invalide" ;;
   esac
 done

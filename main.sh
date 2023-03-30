@@ -51,7 +51,7 @@ while true; do
             ;;
         2)
             echo -e "${BLUE}Partie 2 - Explorateur de processus...${RESET}"
-            ./processus.sh
+            ./processes.sh
             clear
             ;;
         3)
