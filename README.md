@@ -24,6 +24,14 @@ You can also directly launch one of the utility scripts :
 * `processes.sh`
 * `services.sh`
 
+### Delegate rights to another user
+
+You can delegate the rights to use the utilities to another user by running `delegate.sh` as root.
+
+```bash
+sudo ./delegate.sh
+```
+
 ## Project team
 
 <table align="center">
@@ -39,4 +47,4 @@ You can also directly launch one of the utility scripts :
 
 ## Report
 
-You can read our [report here](report.md).
+You can read our [report here](REPORT.md).
