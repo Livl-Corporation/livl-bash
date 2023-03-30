@@ -27,9 +27,8 @@ header()
 }
 
 
-
+clear
 while true; do
-    clear
 
     header
 
@@ -47,17 +46,14 @@ while true; do
         1)
             echo -e "${BLUE}Partie 1 - Explorateur de fichiers :...${RESET}"
             ./files.sh
-            clear
             ;;
         2)
             echo -e "${BLUE}Partie 2 - Explorateur de processus...${RESET}"
             ./processes.sh
-            clear
             ;;
         3)
             echo -e "${BLUE}Partie3 - Explorateur de services...${RESET}"
             ./services.sh
-            clear
             ;;
         4)
             echo ""
