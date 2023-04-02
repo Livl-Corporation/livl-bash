@@ -46,7 +46,7 @@ function show_menu() {
 while true; do
     clear 
     show_menu
-    read -p "Entrez votre choix (1-${#options[@]}): " choice
+    read -p "Entrez votre choix (1-${#MENU_OPTIONS[@]}): " choice
 
     if ((choice >= 1 && choice <= ${#MENU_ACTIONS[@]})); then
         run_menu_option "$choice" "${MENU_OPTIONS[$choice-1]}" "${MENU_ACTIONS[$choice-1]}"
