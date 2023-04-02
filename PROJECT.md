@@ -46,7 +46,7 @@ t) Proposer une fonctionnalité supplémentaire que vous jugez intéressante et 
 
 Proposer une interface grâce à un shell-script permettant d’effectuer les actions précédentes dans le cadre d’un menu interactif et permettant d’appliquer un filtre de recherche combinant les possibilités (taille ET/OU date ET/OU nom).
 
-## Partie2 – Explorateur de processus
+## Partie 2 – Explorateur de processus
 
 a) Identifier tous les processus présents sur le système et indiquer leur propriétaire
 
@@ -68,7 +68,7 @@ Proposer une interface grâce à un shell-script permettant d’effectuer les ac
 
 L’affichage du résultat sera rafraichi automatiquement toutes les 30 secondes.
 
-## Partie3 – Explorateur de services
+## Partie 3 – Explorateur de services
 
 a) Identifier les services disponibles/installés sur le système
 
@@ -82,11 +82,11 @@ d) Proposer une fonctionnalité supplémentaire que vous jugez intéressante et 
 
 Proposer une interface grâce à un shell-script permettant d’effectuer les actions précédentes dans le cadre d’un menu interactif L’affichage du résultat sera rafraichi automatiquement toutes les 30 secondes.
 
-## Partie4 - Interface globale
+## Partie 4 - Interface globale
 
 Proposer une interface globale regroupant l’ensemble des trois shell-scripts.
 
-## Partie5 – Délégation de droits
+## Partie 5 – Délégation de droits
 
 Proposer une solution et la configuration permettant de déléguer l’usage de vos scripts à un simple utilisateur de façon à ce que celui-ci puisse consulter toutes les informations (fichiers, processus, services) sans pour autant avoir la possibilité d’interagir avec eux comme pourrait le faire un administrateur.
 
