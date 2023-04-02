@@ -4,7 +4,7 @@ source common.sh
 
 header()
 {
-    echo -e "${BLUE}${BOLD}               ____               _      __            "
+    echo -e "${CYAN}${BOLD}               ____               _      __            "
     echo -e "              / __ \_________    (_)__  / /_           "
     echo -e "             / /_/ / ___/ __ \  / / _ \/ __/           "
     echo -e "            / ____/ /  / /_/ / / /  __/ /_             "
@@ -27,24 +27,24 @@ while true; do
     echo -e "${RESET}"
     echo -e "${YELLOW}Quel script voulez-vous exécuter ?${RESET}"
     echo ""
-    echo -e "${BLUE}Partie ${RESET}${RED}1${RESET}${BLUE} - Explorateur de fichiers${RESET}"
-    echo -e "${BLUE}Partie ${RESET}${RED}2${RESET}${BLUE} - Explorateur de processus${RESET}"
-    echo -e "${BLUE}Partie ${RESET}${RED}3${RESET}${BLUE} - Explorateur de services${RESET}"
+    echo -e "${CYAN}Partie ${RESET}${RED}1${RESET}${CYAN} - Explorateur de fichiers${RESET}"
+    echo -e "${CYAN}Partie ${RESET}${RED}2${RESET}${CYAN} - Explorateur de processus${RESET}"
+    echo -e "${CYAN}Partie ${RESET}${RED}3${RESET}${CYAN} - Explorateur de services${RESET}"
     echo -e "${GREEN}Partie 4 - Quitter${RESET}"
     echo ""
     read -p "Entrez un numéro : " choice
 
     case $choice in
         1)
-            echo -e "${BLUE}Partie 1 - Explorateur de fichiers :...${RESET}"
+            echo -e "${CYAN}Partie 1 - Explorateur de fichiers :...${RESET}"
             ./files.sh
             ;;
         2)
-            echo -e "${BLUE}Partie 2 - Explorateur de processus...${RESET}"
+            echo -e "${CYAN}Partie 2 - Explorateur de processus...${RESET}"
             ./processes.sh
             ;;
         3)
-            echo -e "${BLUE}Partie3 - Explorateur de services...${RESET}"
+            echo -e "${CYAN}Partie3 - Explorateur de services...${RESET}"
             ./services.sh
             ;;
         4)
